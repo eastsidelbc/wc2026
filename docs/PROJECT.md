@@ -17,9 +17,11 @@ Built to be used during the tournament (Jun 11 – Jul 19, 2026).
 | IDE | Cursor + WSL + Claude Code |
 
 ## API Keys
-- Zafronix: stored in `.env.local` as `ZAFRONIX_API_KEY` — DO NOT commit
+- Zafronix (serverless): `.env.local` → `ZAFRONIX_API_KEY` — used by `api/` functions via `process.env`
+- Zafronix (client dev): `.env.local` → `VITE_ZAFRONIX_KEY` — used by `src/services/api.js` via `import.meta.env` in dev mode
+- Both keys hold the same Zafronix value; the `VITE_` prefix is required for Vite to expose it client-side — DO NOT commit `.env.local`
 - ESPN: no key needed
-- Vercel env vars: add `ZAFRONIX_API_KEY` in Vercel dashboard settings
+- Vercel env vars: add `ZAFRONIX_API_KEY` (Production + Preview) in Vercel dashboard settings
 
 ## Tabs / Features
 | Tab | Data Source | Status |
@@ -33,7 +35,7 @@ Built to be used during the tournament (Jun 11 – Jul 19, 2026).
 
 ## Current Status
 🔲 Project scaffolded, not yet pushed to GitHub
-🔲 `npm install` not yet run
+🔲 `bun install` not yet run
 🔲 Zafronix key not yet added to .env.local
 🔲 Vercel not yet connected
 

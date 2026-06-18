@@ -4,6 +4,21 @@ Format: [Date] — What changed and why
 
 ---
 
+## [2026-06-18] — Consistency Audit: Bun Commands + Env Var Docs
+
+### Bun command consistency
+- `CLAUDE.md`: replaced incorrect rule 7 (`bun vercel dev` / `bunx run dev`) with canonical Bun commands — dev `bun run dev`, build `bun run build`, install `bun install`; never `vercel dev`/npm/npx/yarn
+- `docs/PROJECT.md`: `npm install` → `bun install` in status checklist
+- `docs/CHANGELOG.md`: `npm install` → `bun install` and `npm run dev` → `bun run dev` in scaffold next-steps
+- `package.json` left unchanged — `bunx --bun vite` scripts are functional and used by the working prod deploy
+
+### Env var documentation
+- Code verified correct: serverless uses `process.env.ZAFRONIX_API_KEY`, client dev uses `import.meta.env.VITE_ZAFRONIX_KEY` — no code changes
+- Fixed doc gap: client dev path requires `VITE_ZAFRONIX_KEY` but no doc mentioned it; `.env.local` needs BOTH keys
+- `CLAUDE.md` (new rule 8), `docs/PROJECT.md` (API Keys), `docs/agents/AGENT-DATA.md` (source table) now document both keys and their consumers
+
+---
+
 ## [2026-06-18] — Leaderboard Clean Sheets Tab + ESPN Date Range Fix
 
 ### ESPN scoreboard date range
@@ -68,11 +83,11 @@ Format: [Date] — What changed and why
 - Static data separate from components: AGENT-CONTENT can update without touching logic
 
 ### Next Steps
-- [ ] Run `npm install` in project root
+- [ ] Run `bun install` in project root
 - [ ] Add Zafronix key to `.env.local`
 - [ ] Push to GitHub
 - [ ] Connect Vercel to GitHub repo
 - [ ] Add `ZAFRONIX_API_KEY` to Vercel environment variables
-- [ ] Test `npm run dev` locally
+- [ ] Test `bun run dev` locally
 - [ ] Wire live Zafronix data into Groups standings
 - [ ] Wire live Zafronix data into Leaderboard

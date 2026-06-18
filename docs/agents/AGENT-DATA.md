@@ -15,7 +15,7 @@ Read this when doing any data fetching, API, caching, or serverless function wor
 ## API Sources
 | Source | URL | Key | Use |
 |---|---|---|---|
-| Zafronix | api.zafronix.com | `ZAFRONIX_API_KEY` in .env.local | Matches, standings, scorers, players |
+| Zafronix | api.zafronix.com | `.env.local`: `ZAFRONIX_API_KEY` (serverless, `process.env`) + `VITE_ZAFRONIX_KEY` (client dev, `import.meta.env`) | Matches, standings, scorers, players |
 | ESPN | site.api.espn.com | None | Live scores only |
 | Fallback | raw.githubusercontent.com/openfootball | None | Last resort for matches |
 
