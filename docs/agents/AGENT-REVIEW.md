@@ -76,6 +76,14 @@ flag, and fix existing code only.
 - Are complex data transformations commented?
 - Are the agent boundaries being respected — is AGENT-UI code in UI files only?
 
+### 🔴 Syntax & Duplicate Code
+- Scan every file for duplicate variable declarations (const x declared twice in same scope)
+- Scan every file for duplicate function definitions
+- Scan serverless functions in api/ specifically — duplicate code here causes silent production failures while localhost works fine (localhost bypasses api/ entirely in dev mode via isDev flag)
+- Check for unclosed brackets, missing return statements, unreachable code after return
+- Any syntax error in api/ = production broken, dev unaffected = hardest bug to catch
+- Run a mental "does this file have any line that appears twice" check on every api/ file before signing off
+
 ## Output Format
 
 Start with a one-paragraph honest summary of overall code health.
