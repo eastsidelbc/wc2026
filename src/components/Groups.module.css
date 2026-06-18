@@ -1,0 +1,85 @@
+.infoBar {
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-size: 12px;
+  color: #93c5fd;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.groupCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.groupCard.open { border-color: rgba(245,200,66,0.3); }
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
+  gap: 8px;
+}
+
+.groupLetter {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--gold);
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.groupPreview {
+  font-size: 13px;
+  color: var(--subtext);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.groupPreview strong { color: var(--text); }
+
+.groupArrow {
+  color: var(--muted);
+  font-size: 11px;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.groupCard.open .groupArrow { transform: rotate(180deg); }
+
+.groupBody { border-top: 1px solid var(--border); }
+
+.teamRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.teamRow:last-child { border-bottom: none; }
+
+.teamFlag { font-size: 20px; flex-shrink: 0; }
+
+.teamInfo { flex: 1; min-width: 0; }
+.teamName { font-size: 14px; font-weight: 600; }
+.teamSub  { font-size: 11px; color: var(--subtext); margin-top: 1px; }
+
+.verdict {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+.vLock   { background: rgba(245,200,66,0.15); color: var(--gold); }
+.vLikely { background: rgba(59,130,246,0.12); color: #60a5fa; }
+.vBubble { background: rgba(34,197,94,0.12);  color: #4ade80; }
+.vOut    { background: rgba(107,114,128,0.1); color: var(--muted); }

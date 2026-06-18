@@ -1,0 +1,106 @@
+.liveBar {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #fca5a5;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: 14px;
+}
+.chips::-webkit-scrollbar { display: none; }
+
+.chip {
+  flex-shrink: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--subtext);
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.chip.active {
+  background: rgba(245,200,66,0.1);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.dayBlock { margin-bottom: 20px; }
+
+.dayLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  padding-left: 2px;
+}
+
+.matchCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 13px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.matchGroup {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  width: 18px;
+  flex-shrink: 0;
+}
+
+.matchTeams {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.vs { color: var(--muted); font-size: 11px; font-weight: 400; }
+
+.liveScore {
+  background: rgba(239,68,68,0.15);
+  color: #fca5a5;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.matchTime {
+  font-size: 11px;
+  color: var(--subtext);
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.matchHot { color: #ff6b35; font-size: 13px; flex-shrink: 0; }
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 0;
+  font-size: 14px;
+}
