@@ -47,6 +47,19 @@ wc2026/
 └── vite.config.js
 ```
 
+## Data Source Strategy
+
+| Metric | Primary | Fallback |
+|---|---|---|
+| Goals leaderboard | ESPN `details[].scoringPlay` | Zafronix `matches[].goals[]` |
+| Cards leaderboard | ESPN `details[].yellowCard/redCard` | — (none) |
+| Assists | ESPN (not available yet) | — |
+| Live scores | ESPN scoreboard | — |
+| Match results + scores | Zafronix `/matches` | ESPN scoreboard |
+| Group standings | Zafronix `/standings` | — |
+| Stadium + city | Zafronix `/stadiums` | — |
+| Bracket | Zafronix `/bracket` (future) | — |
+
 ## Data Flow
 ```
 User Browser
@@ -57,10 +70,22 @@ User Browser
                               │
                               ├── /api/zafronix/* → api.zafronix.com
                               │     (key hidden server-side)
+                              │     Owns: matches, standings, roster
                               │
                               └── /api/espn/live  → site.api.espn.com
                                     (CORS fixed server-side)
+                                    Owns: goal/card leaders, live scores
 ```
+
+## Hooks
+| Hook | Source | Fallback |
+|---|---|---|
+| `useMatches` | Zafronix | openfootball JSON |
+| `useStandings` | Zafronix | — |
+| `useScorers` | Zafronix roster (temp) | — |
+| `useLiveScores` | ESPN | — |
+| `useEspnLeaderboard` | ESPN scoreboard | Zafronix goals[] |
+| `useRoster` | Zafronix | — |
 
 ## Rate Limit Strategy
 - Zafronix free tier = 250 req/day
@@ -68,6 +93,7 @@ User Browser
 - Matches: 5 min cache
 - Standings: 5 min cache
 - Scorers: 10 min cache
+- ESPN leaderboard: 2 min cache
 - ESPN live scores: only polled during active match windows (kickoff ± 120 min)
 - Poll interval: 45 seconds during live windows only
 

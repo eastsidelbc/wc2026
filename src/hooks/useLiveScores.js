@@ -29,9 +29,8 @@ export function useLiveScores(matches = []) {
         const events = data?.events || []
         setLiveScores(events)
         setLastUpdated(new Date())
-      } catch (err) {
-        console.warn('Live scores poll failed:', err.message)
-      }
+      } catch (_) {}
+
     }
 
     poll() // immediate first call

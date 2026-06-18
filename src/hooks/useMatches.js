@@ -44,8 +44,7 @@ export function useMatches() {
           setLoading(false)
           sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: matches, ts: Date.now() }))
         }
-      } catch (err) {
-        console.warn('Zafronix failed, trying fallback:', err.message)
+      } catch (_) {
         try {
           const fallback = await fetchFallbackMatches()
           if (!cancelled) {

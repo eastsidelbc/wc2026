@@ -54,6 +54,12 @@
   padding: 11px 13px;
   margin-bottom: 6px;
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.matchRow {
+  display: flex;
   align-items: center;
   gap: 8px;
 }
@@ -98,9 +104,96 @@
 
 .matchHot { color: #ff6b35; font-size: 13px; flex-shrink: 0; }
 
+.matchVenue {
+  font-size: 11px;
+  color: var(--muted);
+  padding-left: 26px;
+}
+
+.finalScore {
+  background: rgba(59,130,246,0.12);
+  color: #93c5fd;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-variant-numeric: tabular-nums;
+}
+
 .empty {
   text-align: center;
   color: var(--muted);
   padding: 40px 0;
   font-size: 14px;
+}
+
+/* Completed match — clickable */
+.matchCard.completed { cursor: pointer; }
+.matchCard.completed:active { opacity: 0.85; }
+.matchCard.open { border-color: rgba(245,200,66,0.25); }
+
+.matchArrow {
+  color: var(--muted);
+  font-size: 10px;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.matchCard.open .matchArrow { transform: rotate(180deg); }
+
+/* Recap accordion */
+.recapExpand {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.28s ease, opacity 0.2s ease;
+}
+.matchCard.open .recapExpand {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.recapInner {
+  border-top: 1px solid var(--border);
+  padding: 10px 0 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recapVenue {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.recapGoals { display: flex; flex-direction: column; gap: 4px; }
+
+.recapGoalRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.recapMinute {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  width: 30px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.recapScorer { flex: 1; color: var(--text); }
+
+.recapOG { color: var(--muted); font-size: 11px; }
+
+.recapBall { flex-shrink: 0; font-size: 13px; }
+
+.recapHeadline {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--subtext);
+  line-height: 1.5;
+  border-left: 2px solid var(--gold);
+  padding-left: 8px;
 }

@@ -25,10 +25,11 @@ Built to be used during the tournament (Jun 11 – Jul 19, 2026).
 | Tab | Data Source | Status |
 |---|---|---|
 | Power Rankings | Static (`src/data/static.js`) | ✅ Done |
-| Groups | Static + Zafronix standings | ✅ Done (static), 🔲 live pending |
-| Schedule | Static + ESPN live scores | ✅ Done (static), 🔲 live pending |
-| Leaderboard | Zafronix scorers | ✅ Shell done, 🔲 API pending |
+| Groups | Static + Zafronix standings | ✅ Live standings + verdict badges wired |
+| Schedule | Static + Zafronix + ESPN | ✅ Scores, venue, match recap accordion |
+| Leaderboard | ESPN scoreboard | ✅ Goals / Assists / Cards live from ESPN |
 | Storylines | Static | ✅ Done |
+| Fun Facts | Zafronix on-this-day + trivia | ✅ Done |
 
 ## Current Status
 🔲 Project scaffolded, not yet pushed to GitHub

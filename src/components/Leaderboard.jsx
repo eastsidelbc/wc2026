@@ -1,20 +1,32 @@
 import { useState } from 'react'
-import { useScorers } from '../hooks/useScorers.js'
+import { useEspnLeaderboard } from '../hooks/useEspnLeaderboard.js'
 import styles from './Leaderboard.module.css'
 
 const TABS = ['Goals', 'Assists', 'Cards']
 
+function PlayerAvatar({ headshot }) {
+  if (headshot) {
+    return (
+      <img
+        src={headshot}
+        alt=""
+        className={styles.flag}
+        style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }}
+        onError={e => { e.currentTarget.style.display = 'none' }}
+      />
+    )
+  }
+  return <div className={styles.flag}>🏳️</div>
+}
+
 export default function Leaderboard() {
   const [activeTab, setActiveTab] = useState('Goals')
-  const { scorers, loading, error } = useScorers()
+  const { goalLeaders, assistLeaders, cardLeaders, loading, error } = useEspnLeaderboard()
 
-  // Sort based on active tab
-  const sorted = [...scorers].sort((a, b) => {
-    if (activeTab === 'Goals')   return (b.goals   ?? 0) - (a.goals   ?? 0)
-    if (activeTab === 'Assists') return (b.assists  ?? 0) - (a.assists  ?? 0)
-    if (activeTab === 'Cards')   return (b.yellowCards ?? 0) - (a.yellowCards ?? 0)
-    return 0
-  }).slice(0, 20)
+  const rows =
+    activeTab === 'Goals'   ? goalLeaders   :
+    activeTab === 'Assists' ? assistLeaders :
+    cardLeaders
 
   return (
     <div>
@@ -39,32 +51,33 @@ export default function Leaderboard() {
         </div>
       )}
 
-      {error && (
+      {error && !loading && (
         <div className={styles.errorState}>
-          ⚠️ {error} — data will appear once the tournament starts.
+          ⚠️ {error} — data will appear once matches begin.
         </div>
       )}
 
-      {!loading && !error && sorted.length === 0 && (
-        <div className={styles.state}>
-          No data yet — check back once matches begin.
-        </div>
+      {!loading && !error && rows.length === 0 && (
+        <div className={styles.state}>No data yet — check back once matches begin.</div>
       )}
 
-      {!loading && sorted.length > 0 && sorted.map((player, i) => (
-        <div key={player.name || i} className={styles.playerRow}>
-          <div className={`${styles.rank} ${i < 3 ? styles.topRank : ''}`}>
-            {i + 1}
-          </div>
-          <div className={styles.flag}>{player.flag || player.country_flag || '🏳️'}</div>
+      {!loading && rows.length > 0 && rows.slice(0, 20).map((player, i) => (
+        <div key={player.name} className={styles.playerRow}>
+          <div className={`${styles.rank} ${i < 3 ? styles.topRank : ''}`}>{i + 1}</div>
+          <PlayerAvatar headshot={player.headshot} />
           <div className={styles.playerInfo}>
             <div className={styles.playerName}>{player.name}</div>
-            <div className={styles.playerTeam}>{player.team || player.country}</div>
+            <div className={styles.playerTeam}>{player.team}</div>
           </div>
           <div className={styles.statBadge}>
-            {activeTab === 'Goals'   && <>{player.goals   ?? 0} ⚽</>}
-            {activeTab === 'Assists' && <>{player.assists  ?? 0} 🎯</>}
-            {activeTab === 'Cards'   && <>{player.yellowCards ?? 0} 🟨</>}
+            {activeTab === 'Goals'   && <>{player.goals} ⚽</>}
+            {activeTab === 'Assists' && <>{player.assists} 🎯</>}
+            {activeTab === 'Cards'   && (
+              <>
+                {player.yellowCards > 0 && <span>{player.yellowCards} 🟨</span>}
+                {player.redCards    > 0 && <span style={{ marginLeft: 4 }}>{player.redCards} 🟥</span>}
+              </>
+            )}
           </div>
         </div>
       ))}

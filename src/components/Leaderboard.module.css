@@ -96,3 +96,58 @@
   min-width: 44px;
   text-align: right;
 }
+
+/* Roster table */
+.rosterRow {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rosterJersey {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--muted);
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.rosterInfo { flex: 1; min-width: 0; }
+.rosterName {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.captainBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 3px;
+  padding: 1px 4px;
+  flex-shrink: 0;
+}
+.rosterSub { font-size: 11px; color: var(--subtext); margin-top: 1px; }
+
+.rosterPos {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.06);
+  color: var(--subtext);
+}
+.rosterPos.gk  { background: rgba(245,200,66,0.12); color: var(--gold); }
+.rosterPos.def { background: rgba(59,130,246,0.12); color: #60a5fa; }
+.rosterPos.mid { background: rgba(34,197,94,0.12);  color: #4ade80; }
+.rosterPos.fwd { background: rgba(239,68,68,0.12);  color: #fca5a5; }
