@@ -4,12 +4,14 @@
 // Only called during active match windows (enforced client-side too).
 // AGENT-DATA is responsible for changes to this file.
 
-const ESPN_URL =
+const ESPN_SCOREBOARD_BASE =
   'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard'
 
 export default async function handler(req, res) {
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  const espnUrl = `${ESPN_SCOREBOARD_BASE}?limit=200&dates=20260611-${today}`
   try {
-    const upstream = await fetch(ESPN_URL, {
+    const upstream = await fetch(espnUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; wc2026-dashboard/1.0)',
         'Accept': 'application/json',

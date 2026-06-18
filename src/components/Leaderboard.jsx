@@ -1,8 +1,29 @@
 import { useState } from 'react'
 import { useEspnLeaderboard } from '../hooks/useEspnLeaderboard.js'
+import { useCleanSheets } from '../hooks/useCleanSheets.js'
+import { groups } from '../data/static.js'
 import styles from './Leaderboard.module.css'
 
-const TABS = ['Goals', 'Assists', 'Cards']
+const TABS = ['Goals', 'Assists', 'Cards', 'Clean Sheets']
+
+// Zafronix team names that differ from the static display names in groups data
+const ZAFRONIX_ALIASES = {
+  'South Korea':    'Korea Republic',
+  'Bosnia & Herz.': 'Bosnia and Herzegovina',
+  'Turkey':         'Türkiye',
+  'Ivory Coast':    "Côte d'Ivoire",
+  'Cape Verde':     'Cabo Verde',
+  'Iran':           'IR Iran',
+  'DR Congo':       'Congo DR',
+}
+
+const FLAG_MAP = {}
+for (const g of groups) {
+  for (const t of g.teams) {
+    FLAG_MAP[t.name] = t.flag
+    if (ZAFRONIX_ALIASES[t.name]) FLAG_MAP[ZAFRONIX_ALIASES[t.name]] = t.flag
+  }
+}
 
 function PlayerAvatar({ headshot }) {
   if (headshot) {
@@ -22,11 +43,16 @@ function PlayerAvatar({ headshot }) {
 export default function Leaderboard() {
   const [activeTab, setActiveTab] = useState('Goals')
   const { goalLeaders, assistLeaders, cardLeaders, loading, error } = useEspnLeaderboard()
+  const { leaders: csLeaders, loading: csLoading } = useCleanSheets()
+
+  const isCleanSheets  = activeTab === 'Clean Sheets'
+  const activeLoading  = isCleanSheets ? csLoading : loading
 
   const rows =
     activeTab === 'Goals'   ? goalLeaders   :
     activeTab === 'Assists' ? assistLeaders :
-    cardLeaders
+    activeTab === 'Cards'   ? cardLeaders   :
+    []
 
   return (
     <div>
@@ -44,24 +70,25 @@ export default function Leaderboard() {
         ))}
       </div>
 
-      {loading && (
+      {activeLoading && (
         <div className={styles.state}>
           <div className={styles.spinner} />
           <span>Loading {activeTab.toLowerCase()}...</span>
         </div>
       )}
 
-      {error && !loading && (
+      {error && !loading && !isCleanSheets && (
         <div className={styles.errorState}>
           ⚠️ {error} — data will appear once matches begin.
         </div>
       )}
 
-      {!loading && !error && rows.length === 0 && (
+      {/* Goals / Assists / Cards */}
+      {!isCleanSheets && !loading && !error && rows.length === 0 && (
         <div className={styles.state}>No data yet — check back once matches begin.</div>
       )}
 
-      {!loading && rows.length > 0 && rows.slice(0, 20).map((player, i) => (
+      {!isCleanSheets && !loading && rows.length > 0 && rows.slice(0, 20).map((player, i) => (
         <div key={player.name} className={styles.playerRow}>
           <div className={`${styles.rank} ${i < 3 ? styles.topRank : ''}`}>{i + 1}</div>
           <PlayerAvatar headshot={player.headshot} />
@@ -79,6 +106,23 @@ export default function Leaderboard() {
               </>
             )}
           </div>
+        </div>
+      ))}
+
+      {/* Clean Sheets */}
+      {isCleanSheets && !csLoading && csLeaders.length === 0 && (
+        <div className={styles.state}>No clean sheets recorded yet.</div>
+      )}
+
+      {isCleanSheets && !csLoading && csLeaders.map((cs, i) => (
+        <div key={cs.team} className={styles.playerRow}>
+          <div className={`${styles.rank} ${i < 3 ? styles.topRank : ''}`}>{i + 1}</div>
+          <div className={styles.flag}>{FLAG_MAP[cs.team] ?? '🏳️'}</div>
+          <div className={styles.playerInfo}>
+            <div className={styles.playerName}>{cs.goalkeeper ?? '—'}</div>
+            <div className={styles.playerTeam}>{cs.team}</div>
+          </div>
+          <div className={styles.statBadge}>{cs.cleanSheets} 🧤</div>
         </div>
       ))}
     </div>

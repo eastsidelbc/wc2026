@@ -17,6 +17,11 @@ const NAME_MAP = {
   'DR Congo':     'Congo DR',
 }
 
+// Inverts NAME_MAP: Zafronix team name → ESPN displayName
+const REVERSE_NAME_MAP = Object.fromEntries(
+  Object.entries(NAME_MAP).map(([espn, zaf]) => [zaf, espn])
+)
+
 function teamKey(str) {
   const bare = str.split(' ').slice(1).join(' ')
   return NAME_MAP[bare] ?? bare
@@ -72,7 +77,9 @@ export default function Schedule() {
 
   function getHeadline(zm) {
     if (!zm) return null
-    return headlines[`${zm.homeTeam}|${zm.awayTeam}`] ?? null
+    const home = REVERSE_NAME_MAP[zm.homeTeam] ?? zm.homeTeam
+    const away = REVERSE_NAME_MAP[zm.awayTeam] ?? zm.awayTeam
+    return headlines[`${home}|${away}`] ?? headlines[`${away}|${home}`] ?? null
   }
 
   function toggleMatch(key) {

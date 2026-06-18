@@ -4,6 +4,22 @@ Format: [Date] — What changed and why
 
 ---
 
+## [2026-06-18] — Leaderboard Clean Sheets Tab + ESPN Date Range Fix
+
+### ESPN scoreboard date range
+- `src/services/api.js`: `fetchEspnScoreboard` now appends `?limit=200&dates=20260611-{today}` in dev mode so all tournament matches are returned, not just today's
+- `api/espn/live.js`: same date range computed server-side so production proxy covers full tournament history
+- `src/hooks/useEspnLeaderboard.js`: cache TTL bumped from 2 min to 3 min to match larger response
+
+### Schedule headline name bridge
+- `src/components/Schedule.jsx`: added `REVERSE_NAME_MAP` (inversion of `NAME_MAP`); `getHeadline` now normalizes Zafronix team names → ESPN displayNames before map lookup, fixing namespace mismatch that caused all headlines to miss
+
+### Leaderboard Clean Sheets tab
+- `src/hooks/useCleanSheets.js`: new hook — consumes `useMatches` (no extra API call); walks completed matches, awards clean sheets to whichever side conceded 0; finds starting GK from `lineups.home/.away` where `position === 'GK' && starter === true`; caches result 5 min under `wc2026_cleansheets`; handles 0-0 draws (both teams get +1)
+- `src/components/Leaderboard.jsx`: added 'Clean Sheets' to TABS; imports `useCleanSheets` and `groups`; builds `FLAG_MAP` covering both static display names and Zafronix aliases; Clean Sheets tab renders flag emoji, goalkeeper name, team, count badge (🧤); loading state switches between ESPN and clean-sheets loading per active tab
+
+---
+
 ## [2026-06-18] — Feature Sprint: Leaderboard, Groups, Fun Facts, Schedule Recap
 
 ### Task 1 — Leaderboard Golden Boot

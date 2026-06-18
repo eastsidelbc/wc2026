@@ -83,9 +83,14 @@ export async function fetchEspnLive() {
   return res.json()
 }
 
-// Semantic alias — use this in leaderboard/stats contexts
+// Semantic alias — use this in leaderboard/stats contexts.
+// Includes full tournament date range so ESPN returns all completed matches,
+// not just today's events.
 export async function fetchEspnScoreboard() {
-  const url = isDev ? ESPN_SCOREBOARD : '/api/espn/live'
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  const url = isDev
+    ? `${ESPN_SCOREBOARD}?limit=200&dates=20260611-${today}`
+    : '/api/espn/live'
   const res = await fetch(url)
   if (!res.ok) throw new Error('ESPN scoreboard failed')
   return res.json()

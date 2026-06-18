@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { fetchEspnScoreboard, fetchZafronixGoals } from '../services/api.js'
 
 const CACHE_KEY = 'wc2026_espn_leaderboard'
-const CACHE_TTL = 2 * 60 * 1000
+const CACHE_TTL = 3 * 60 * 1000
 
 function upsert(map, key, name, team, headshot) {
   if (!map[key]) {
