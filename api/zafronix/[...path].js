@@ -12,8 +12,10 @@ const ALLOWED = new Set(['matches', 'standings', 'scorers', 'players', 'teams', 
 const SLOW = new Set(['standings', 'scorers'])
 
 export default async function handler(req, res) {
-  const { path = [] } = req.query
-  const segments = Array.isArray(path) ? path : [path]
+  // Parse path + query from the URL directly — works on both Node and Bun
+  // runtimes (Bun does not populate req.query for [...path] catch-all routes).
+  const url = new URL(req.url, `http://${req.headers.host}`)
+  const segments = url.pathname.replace(/^\/api\/zafronix\/?/, '').split('/').filter(Boolean)
   const firstSegment = segments[0]
 
   if (!ALLOWED.has(firstSegment)) {
@@ -24,13 +26,13 @@ export default async function handler(req, res) {
   const zafronixPath = segments.join('/')
 
   // Forward query params (year, group, etc.)
-  const params = new URLSearchParams(req.query)
+  const params = new URLSearchParams(url.searchParams)
   params.delete('path')
 
-  const url = `${ZAFRONIX_BASE}/${zafronixPath}?${params.toString()}`
+  const upstreamUrl = `${ZAFRONIX_BASE}/${zafronixPath}?${params.toString()}`
 
   try {
-    const upstream = await fetch(url, {
+    const upstream = await fetch(upstreamUrl, {
       headers: {
         'X-API-Key': process.env.ZAFRONIX_API_KEY,
         'Content-Type': 'application/json',
