@@ -4,6 +4,56 @@ Format: [Date] — What changed and why
 
 ---
 
+## [2026-06-23] — Schedule Overhaul: API Audit, Goal Split, 4 New Features, Today Filter
+
+### Bug fix: USA vs Australia showing as USA vs Turkey
+- Root cause: `fixtures` was built entirely from Zafronix data — bad `awayTeam` from their API corrupted the display
+- Fix: static `schedule` is now the permanent source of truth for team names/dates/groups; Zafronix only enriches scores/venues/goals
+- `Schedule.jsx`: removed Zafronix-driven fixture mapping; `getZMatch` always uses `zLookup` via `teamKey` (no more `_zm` shortcut)
+
+### Bug fix: recap headlines missing on USA matches
+- Root cause: Zafronix calls USA `"USA"`, ESPN calls them `"United States"` — headline map lookup was missing
+- Fix: added `ESPN_NAME_MAP` in `Schedule.jsx` mapping Zafronix API names → ESPN displayNames; `getHeadline` and new `getGoalType` both use it
+
+### API field name corrections
+- `fetchZafronixGoals` in `api.js`: fixed to use real field names (`g.scorer` not `g.player`, `g.type === 'own_goal'` not `g.ownGoal`, `g.team` = `"home"`/`"away"` not team name)
+- `/scorers` endpoint removed from proxy ALLOWED list — Zafronix 404s on it (confirmed via live curl)
+
+### Split goals layout in accordion
+- Goals now render in two columns: home team left, away team right, separated by a center divider
+- Stoppage time shown as `90+4'` using `addedMinute` field
+- Penalty (`P`) and own goal (`OG`) badges shown inline
+- Falls back to flat list if `g.team` field is absent
+
+### Feature: goal type badges (ESPN)
+- `useEspnHeadlines.js`: extended to also return `goalTypes` map (`"TeamA|TeamB"` → `{ [minute]: typeText }`) and `teamForms` map (`"ESPN displayName"` → form string)
+- Accordion shows `Header`, `Volley`, `FK` pill badge next to scorer for special goal types; sourced from ESPN `details[].type.text`
+
+### Feature: form dots (ESPN)
+- 3 colored dots per team on each match card showing last 3 results (🟢 W · ⚫ D · 🔴 L)
+- Sourced from ESPN `competitors[].form` — reflects recent international form, not just WC
+
+### Feature: drama score (Zafronix)
+- Completed matches auto-labeled `💥 Chaos`, `🔥 Thriller`, or `⚡ Lively` based on: red cards (×2), late goals 80+ min (×2), score margin (draw +3, one-goal +1), 4+ total goals (+2)
+- Drama label replaces kickoff time on completed match cards; time still shows for upcoming matches
+
+### Feature: elevation badge (Zafronix stadiums)
+- Matches at Estadio Azteca (2,287m) and Estadio Akron (1,671m) show `⛰️ 2,287m` on the venue line
+- `STADIUM_ELEVATION` map added to `static.js` — verified from live `/stadiums?tournament=2026` call
+
+### Feature: Today filter chip
+- Schedule opens on "Today" tab by default showing today's matches + all future dates in one continuous scroll (Google-style)
+- "All" tab shows full history including past results
+- Today chip disappears automatically when tournament ends (no future matches remain)
+- Uses `parseScheduleDate()` to compare formatted date strings (`"Jun 23 (Mon)"`) as real Date objects
+
+### API documentation (new files)
+- `docs/ZAFRONIX-API.md`: full verified endpoint + field reference from live curl calls; includes real goals shape, confirmed dead `/scorers` endpoint, what's Pro+ only, ETag optimization opportunity, "what we could build" table
+- `docs/ESPN-API.md`: reverse-engineered field reference for undocumented ESPN scoreboard; all detail event types, competitor stats, form/records fields, broadcast info
+- `docs/agents/AGENT-DATA.md`: added pointers to both new doc files
+
+---
+
 ## [2026-06-18] — Consistency Audit: Bun Commands + Env Var Docs
 
 ### Bun command consistency
