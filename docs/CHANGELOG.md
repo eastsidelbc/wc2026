@@ -4,6 +4,25 @@ Format: [Date] — What changed and why
 
 ---
 
+## [2026-06-23] — Schedule UX, Group Position Badges, Tab Reorder
+
+### Group position badges on match cards
+- `Schedule.jsx`: imported `useStandings`; built flat `positionMap` (`{ teamName → position }`) from standings data; `getPosition(zName)` helper; each team name now shows current group position as a small badge (e.g. `🇺🇸 USA 1`)
+- `Schedule.module.css`: added `.teamPos` — small muted badge, matches goal type badge style
+- Position hides gracefully while standings load and for knockout matches
+
+### Schedule default to today + future
+- "Today" tab now shows today's matches followed by all future dates in one continuous scroll (Google-style)— no separate "Future" tab needed
+- `parseScheduleDate()` helper converts static formatted date strings (`"Jun 23 (Mon)"`) to Date objects for `>=` comparison
+- Today chip shows whenever any matches remain; disappears after tournament ends
+- Default filter is "Today" during tournament, falls back to "All" after
+
+### Schedule first tab + default landing
+- `App.jsx`: moved Schedule to first position in TABS array; default `activeTab` changed from `'power'` to `'schedule'`
+- Power Rankings moved to third position
+
+---
+
 ## [2026-06-23] — Schedule Overhaul: API Audit, Goal Split, 4 New Features, Today Filter
 
 ### Bug fix: USA vs Australia showing as USA vs Turkey
