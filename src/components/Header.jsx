@@ -7,7 +7,7 @@ export default function Header({ activeTab, tabs, onTabChange }) {
         <span className={styles.trophy}>🏆</span>
         <div className={styles.titles}>
           <h1 className={styles.title}>World Cup 2026</h1>
-          <span className={styles.subtitle}>June 11 – July 19 · USA / MEX / CAN</span>
+          <span className={styles.subtitle}>6/11 – 7/19 · USA / MEX / CAN</span>
         </div>
         <div className={styles.liveBadge}>LIVE</div>
       </div>
