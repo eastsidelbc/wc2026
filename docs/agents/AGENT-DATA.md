@@ -19,6 +19,9 @@ Read this when doing any data fetching, API, caching, or serverless function wor
 | ESPN | site.api.espn.com | None | Live scores only |
 | Fallback | raw.githubusercontent.com/openfootball | None | Last resort for matches |
 
+> **Zafronix full endpoint/field reference:** `docs/ZAFRONIX-API.md` — check there before assuming a feature isn't available.
+> **ESPN reverse-engineered field reference:** `docs/ESPN-API.md` — all verified fields from the undocumented scoreboard endpoint.
+
 ## Rate Limit Rules — CRITICAL
 - Zafronix free tier = **250 requests/day**
 - Cache everything in sessionStorage

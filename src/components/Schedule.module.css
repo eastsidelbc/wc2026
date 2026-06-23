@@ -95,14 +95,51 @@
   font-variant-numeric: tabular-nums;
 }
 
+.matchMeta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
 .matchTime {
   font-size: 11px;
   color: var(--subtext);
-  flex-shrink: 0;
   text-align: right;
 }
 
+.dramaBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
 .matchHot { color: #ff6b35; font-size: 13px; flex-shrink: 0; }
+
+/* Form dots */
+.formRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0 0 26px;
+}
+
+.formDots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.formDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.formW { background: #4ade80; }
+.formD { background: var(--subtext); }
+.formL { background: #f87171; }
 
 .matchVenue {
   font-size: 11px;
@@ -165,6 +202,7 @@
   color: var(--muted);
 }
 
+/* Flat goal list — fallback when g.team is absent */
 .recapGoals { display: flex; flex-direction: column; gap: 4px; }
 
 .recapGoalRow {
@@ -187,7 +225,77 @@
 
 .recapOG { color: var(--muted); font-size: 11px; }
 
+.goalTypeBadge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--subtext);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 4px;
+  margin-left: 4px;
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+}
+
 .recapBall { flex-shrink: 0; font-size: 13px; }
+
+/* Split goals — home left, away right */
+.recapGoalsSplit {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.recapGoalCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.recapGoalColHome { padding-right: 10px; border-right: 1px solid var(--border); }
+.recapGoalColAway { padding-left: 10px; }
+
+.recapGoalColHeader {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+  margin-bottom: 3px;
+}
+
+.recapGoalHome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.recapGoalAway {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.recapScorerName {
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recapMinuteSplit {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gold);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
 
 .recapHeadline {
   font-size: 12px;

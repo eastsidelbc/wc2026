@@ -4,6 +4,35 @@
 // AGENT-CONTENT is responsible for changes to this file
 // ============================================================
 
+// Zafronix API names differ from display names for these teams
+export const TEAM_NAME_MAP = {
+  'South Korea': 'Korea Republic',
+  'Bosnia':      'Bosnia and Herzegovina',
+  'Turkey':      'Türkiye',
+  'Ivory Coast': "Côte d'Ivoire",
+  'Cape Verde':  'Cabo Verde',
+  'Iran':        'IR Iran',
+  'DR Congo':    'Congo DR',
+}
+
+// High-altitude venues only (>1000m) — keyed by Zafronix stadiumId
+// Source: verified from /stadiums?tournament=2026 on 2026-06-23
+export const STADIUM_ELEVATION = {
+  'estadio-azteca': 2287,
+  'estadio-akron':  1671,
+}
+
+
+export const odds = [
+  { flag: '🇪🇸', name: 'Spain',     odds: '+450' },
+  { flag: '🇫🇷', name: 'France',    odds: '+500' },
+  { flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', name: 'England',   odds: '+650' },
+  { flag: '🇧🇷', name: 'Brazil',    odds: '+850' },
+  { flag: '🇦🇷', name: 'Argentina', odds: '+900' },
+  { flag: '🇩🇪', name: 'Germany',   odds: '+1000' },
+  { flag: '🇵🇹', name: 'Portugal',  odds: '+1100' },
+]
+
 export const powerRankings = [
   {
     tier: '🔥 Title Contenders',
@@ -231,7 +260,7 @@ export const schedule = [
   { date: 'Jun 12 (Fri)', group: 'D', home: '🇺🇸 USA',          away: '🇵🇾 Paraguay',     time: '8pm CST',  hot: true  },
   { date: 'Jun 13 (Sat)', group: 'B', home: '🇶🇦 Qatar',        away: '🇨🇭 Switzerland',  time: '2pm CST',  hot: false },
   { date: 'Jun 13 (Sat)', group: 'C', home: '🇧🇷 Brazil',       away: '🇲🇦 Morocco',      time: '5pm CST',  hot: true  },
-  { date: 'Jun 13 (Sat)', group: 'C', home: '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland',   away: '🇭🇹 Haiti',        time: '8pm CST',  hot: false },
+  { date: 'Jun 13 (Sat)', group: 'C', home: '🇭🇹 Haiti',        away: '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland',   time: '8pm CST',  hot: false },
   { date: 'Jun 14 (Sun)', group: 'D', home: '🇦🇺 Australia',    away: '🇹🇷 Turkey',       time: '11pm CST', hot: false },
   { date: 'Jun 14 (Sun)', group: 'E', home: '🇩🇪 Germany',      away: '🇨🇼 Curaçao',      time: '12pm CST', hot: false },
   { date: 'Jun 14 (Sun)', group: 'F', home: '🇳🇱 Netherlands',  away: '🇯🇵 Japan',        time: '3pm CST',  hot: true  },
@@ -250,18 +279,55 @@ export const schedule = [
   { date: 'Jun 17 (Wed)', group: 'L', home: '🇬🇭 Ghana',        away: '🇵🇦 Panama',       time: '6pm CST',  hot: false },
   { date: 'Jun 17 (Wed)', group: 'K', home: '🇺🇿 Uzbekistan',   away: '🇨🇴 Colombia',     time: '9pm CST',  hot: false },
   // ── Matchday 2 ──
-  { date: 'Jun 18 (Thu)', group: 'A', home: '🇲🇽 Mexico',       away: '🇰🇷 South Korea',  time: '8pm CST',  hot: false },
-  { date: 'Jun 19 (Fri)', group: 'D', home: '🇺🇸 USA',          away: '🇹🇷 Turkey',       time: '2pm CST',  hot: true  },
+  { date: 'Jun 18 (Thu)', group: 'A', home: '🇨🇿 Czechia',      away: '🇿🇦 South Africa', time: '2pm CST',  hot: false },
+  { date: 'Jun 18 (Thu)', group: 'B', home: '🇨🇭 Switzerland',  away: '🇧🇦 Bosnia',       time: '5pm CST',  hot: false },
+  { date: 'Jun 18 (Thu)', group: 'B', home: '🇨🇦 Canada',       away: '🇶🇦 Qatar',        time: '8pm CST',  hot: false },
+  { date: 'Jun 18 (Thu)', group: 'A', home: '🇲🇽 Mexico',       away: '🇰🇷 South Korea',  time: '11pm CST', hot: false },
+  { date: 'Jun 19 (Fri)', group: 'D', home: '🇺🇸 USA',          away: '🇦🇺 Australia',    time: '2pm CST',  hot: true  },
+  { date: 'Jun 19 (Fri)', group: 'C', home: '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland',   away: '🇲🇦 Morocco',      time: '5pm CST',  hot: false },
+  { date: 'Jun 19 (Fri)', group: 'C', home: '🇧🇷 Brazil',       away: '🇭🇹 Haiti',        time: '8pm CST',  hot: false },
+  { date: 'Jun 19 (Fri)', group: 'D', home: '🇹🇷 Turkey',       away: '🇵🇾 Paraguay',     time: '10pm CST', hot: false },
   { date: 'Jun 20 (Sat)', group: 'F', home: '🇳🇱 Netherlands',  away: '🇸🇪 Sweden',       time: '12pm CST', hot: false },
+  { date: 'Jun 20 (Sat)', group: 'E', home: '🇩🇪 Germany',      away: '🇨🇮 Ivory Coast',  time: '3pm CST',  hot: false },
+  { date: 'Jun 20 (Sat)', group: 'E', home: '🇪🇨 Ecuador',      away: '🇨🇼 Curaçao',      time: '6pm CST',  hot: false },
+  { date: 'Jun 20 (Sat)', group: 'F', home: '🇹🇳 Tunisia',      away: '🇯🇵 Japan',        time: '9pm CST',  hot: false },
   { date: 'Jun 21 (Sun)', group: 'H', home: '🇪🇸 Spain',        away: '🇸🇦 Saudi Arabia', time: '11am CST', hot: false },
   { date: 'Jun 21 (Sun)', group: 'G', home: '🇧🇪 Belgium',      away: '🇮🇷 Iran',         time: '2pm CST',  hot: false },
   { date: 'Jun 21 (Sun)', group: 'H', home: '🇺🇾 Uruguay',      away: '🇨🇻 Cape Verde',   time: '5pm CST',  hot: false },
+  { date: 'Jun 21 (Sun)', group: 'G', home: '🇳🇿 New Zealand',  away: '🇪🇬 Egypt',        time: '8pm CST',  hot: false },
   { date: 'Jun 22 (Mon)', group: 'J', home: '🇦🇷 Argentina',    away: '🇦🇹 Austria',      time: '12pm CST', hot: true  },
   { date: 'Jun 22 (Mon)', group: 'I', home: '🇫🇷 France',       away: '🇮🇶 Iraq',         time: '4pm CST',  hot: false },
   { date: 'Jun 22 (Mon)', group: 'I', home: '🇳🇴 Norway',       away: '🇸🇳 Senegal',      time: '7pm CST',  hot: true  },
+  { date: 'Jun 22 (Mon)', group: 'J', home: '🇯🇴 Jordan',       away: '🇩🇿 Algeria',      time: '9pm CST',  hot: false },
   { date: 'Jun 23 (Tue)', group: 'K', home: '🇵🇹 Portugal',     away: '🇺🇿 Uzbekistan',   time: '12pm CST', hot: false },
   { date: 'Jun 23 (Tue)', group: 'L', home: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',    away: '🇬🇭 Ghana',        time: '3pm CST',  hot: false },
+  { date: 'Jun 23 (Tue)', group: 'L', home: '🇵🇦 Panama',       away: '🇭🇷 Croatia',      time: '6pm CST',  hot: false },
   { date: 'Jun 23 (Tue)', group: 'K', home: '🇨🇴 Colombia',     away: '🇨🇩 DR Congo',     time: '9pm CST',  hot: false },
+  // ── Matchday 3 (simultaneous per group) ──
+  { date: 'Jun 24 (Wed)', group: 'B', home: '🇨🇭 Switzerland',  away: '🇨🇦 Canada',       time: '2pm CST',  hot: false },
+  { date: 'Jun 24 (Wed)', group: 'B', home: '🇧🇦 Bosnia',       away: '🇶🇦 Qatar',        time: '2pm CST',  hot: false },
+  { date: 'Jun 24 (Wed)', group: 'C', home: '🇲🇦 Morocco',      away: '🇭🇹 Haiti',        time: '5pm CST',  hot: false },
+  { date: 'Jun 24 (Wed)', group: 'C', home: '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland',   away: '🇧🇷 Brazil',       time: '5pm CST',  hot: true  },
+  { date: 'Jun 24 (Wed)', group: 'A', home: '🇨🇿 Czechia',      away: '🇲🇽 Mexico',       time: '8pm CST',  hot: false },
+  { date: 'Jun 24 (Wed)', group: 'A', home: '🇿🇦 South Africa', away: '🇰🇷 South Korea',  time: '8pm CST',  hot: false },
+  { date: 'Jun 25 (Thu)', group: 'E', home: '🇨🇼 Curaçao',      away: '🇨🇮 Ivory Coast',  time: '3pm CST',  hot: false },
+  { date: 'Jun 25 (Thu)', group: 'E', home: '🇪🇨 Ecuador',      away: '🇩🇪 Germany',      time: '3pm CST',  hot: false },
+  { date: 'Jun 25 (Thu)', group: 'F', home: '🇯🇵 Japan',        away: '🇸🇪 Sweden',       time: '6pm CST',  hot: false },
+  { date: 'Jun 25 (Thu)', group: 'F', home: '🇹🇳 Tunisia',      away: '🇳🇱 Netherlands',  time: '6pm CST',  hot: false },
+  { date: 'Jun 25 (Thu)', group: 'D', home: '🇹🇷 Turkey',       away: '🇺🇸 USA',          time: '9pm CST',  hot: true  },
+  { date: 'Jun 25 (Thu)', group: 'D', home: '🇵🇾 Paraguay',     away: '🇦🇺 Australia',    time: '9pm CST',  hot: false },
+  { date: 'Jun 26 (Fri)', group: 'I', home: '🇳🇴 Norway',       away: '🇫🇷 France',       time: '2pm CST',  hot: true  },
+  { date: 'Jun 26 (Fri)', group: 'I', home: '🇸🇳 Senegal',      away: '🇮🇶 Iraq',         time: '2pm CST',  hot: false },
+  { date: 'Jun 26 (Fri)', group: 'H', home: '🇨🇻 Cape Verde',   away: '🇸🇦 Saudi Arabia', time: '7pm CST',  hot: false },
+  { date: 'Jun 26 (Fri)', group: 'H', home: '🇺🇾 Uruguay',      away: '🇪🇸 Spain',        time: '7pm CST',  hot: true  },
+  { date: 'Jun 26 (Fri)', group: 'G', home: '🇳🇿 New Zealand',  away: '🇧🇪 Belgium',      time: '10pm CST', hot: false },
+  { date: 'Jun 26 (Fri)', group: 'G', home: '🇪🇬 Egypt',        away: '🇮🇷 Iran',         time: '10pm CST', hot: false },
+  { date: 'Jun 27 (Sat)', group: 'L', home: '🇵🇦 Panama',       away: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',    time: '4pm CST',  hot: true  },
+  { date: 'Jun 27 (Sat)', group: 'L', home: '🇭🇷 Croatia',      away: '🇬🇭 Ghana',        time: '4pm CST',  hot: false },
+  { date: 'Jun 27 (Sat)', group: 'J', home: '🇩🇿 Algeria',      away: '🇦🇹 Austria',      time: '7pm CST',  hot: false },
+  { date: 'Jun 27 (Sat)', group: 'J', home: '🇯🇴 Jordan',       away: '🇦🇷 Argentina',    time: '7pm CST',  hot: true  },
+  { date: 'Jun 27 (Sat)', group: 'K', home: '🇨🇴 Colombia',     away: '🇵🇹 Portugal',     time: '10pm CST', hot: true  },
+  { date: 'Jun 27 (Sat)', group: 'K', home: '🇨🇩 DR Congo',     away: '🇺🇿 Uzbekistan',   time: '10pm CST', hot: false },
 ]
 
 export const storylines = [

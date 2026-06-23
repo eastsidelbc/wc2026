@@ -1,9 +1,10 @@
 # wc2026 — Claude Code Instructions
 
-## Read First
-- docs/PROJECT.md — what this app is, stack, API keys, current status
-- docs/ARCHITECTURE.md — folder structure, data flow, key decisions
-- docs/CHANGELOG.md — what changed last session
+## Read First (every session, before any task)
+1. Read all memory files listed in `~/.claude/projects/-mnt-c-Users-Soy-Documents-Repos-wc2026/memory/MEMORY.md` — start with the index, then read each linked file
+2. docs/CHANGELOG.md — what changed last session
+3. docs/PROJECT.md — current status table
+4. docs/ARCHITECTURE.md — only if doing structural work
 
 ## Agent System
 Before any task, identify which agent applies and read its file:

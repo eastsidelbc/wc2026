@@ -105,10 +105,11 @@ export async function fetchZafronixGoals(year = 2026) {
 
   for (const match of matches) {
     for (const goal of (match.goals ?? [])) {
-      if (goal.ownGoal) continue
-      const name = goal.scorer ?? goal.player ?? goal.playerName
+      if (goal.type === 'own_goal') continue
+      const name = goal.scorer
       if (!name) continue
-      const team = goal.team ?? goal.teamName ?? ''
+      const side = goal.team // 'home' or 'away'
+      const team = side === 'home' ? match.homeTeam : side === 'away' ? match.awayTeam : ''
       if (!scorerMap[name]) {
         scorerMap[name] = { name, team, headshot: null, goals: 0, yellowCards: 0, redCards: 0 }
       }
