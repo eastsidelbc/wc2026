@@ -72,7 +72,7 @@ export default function Storylines() {
               rel="noopener noreferrer"
             >
               <div className={styles.buzzMeta}>
-                <span className={styles.buzzSource}>BBC Sport</span>
+                <span className={styles.buzzSource}>{a.source}</span>
                 <span className={styles.buzzTime}>{timeAgo(a.pubDate)}</span>
               </div>
               <div className={styles.buzzTitle}>{a.title}</div>
