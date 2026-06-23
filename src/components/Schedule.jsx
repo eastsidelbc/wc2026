@@ -38,8 +38,14 @@ function formatToday() {
   return `${month} ${day} (${weekday})`
 }
 
-const TODAY = formatToday()
-const hasTodayInSchedule = schedule.some(m => m.date === TODAY)
+function parseScheduleDate(str) {
+  return new Date(str.replace(/\s*\(.*\)/, '') + ' 2026')
+}
+
+const TODAY     = formatToday()
+const TODAY_D   = parseScheduleDate(TODAY)
+// Show Today chip whenever any matches remain (today or future)
+const hasTodayOrFuture = schedule.some(m => parseScheduleDate(m.date) >= TODAY_D)
 
 // ESPN goal type text → short badge label (null = don't show)
 function goalTypeBadge(typeText) {
@@ -78,7 +84,7 @@ function getDrama(zm) {
 }
 
 export default function Schedule() {
-  const [filter,    setFilter]    = useState(hasTodayInSchedule ? 'today' : 'all')
+  const [filter,    setFilter]    = useState(hasTodayOrFuture ? 'today' : 'all')
   const [openMatch, setOpenMatch] = useState(null)
 
   const { matches: zMatches }              = useMatches()
@@ -112,9 +118,10 @@ export default function Schedule() {
 
   const filtered = {}
   Object.entries(byDate).forEach(([date, matches]) => {
+    const isCurrentOrFuture = parseScheduleDate(date) >= TODAY_D
     const shown = matches.filter(m => {
       if (filter === 'all')   return true
-      if (filter === 'today') return date === TODAY
+      if (filter === 'today') return isCurrentOrFuture
       if (filter === '🔥')    return m.hot
       return m.group === filter
     })
@@ -165,7 +172,7 @@ export default function Schedule() {
       )}
 
       <div className={styles.chips}>
-        {[...(hasTodayInSchedule ? ['today'] : []), 'all', '🔥', ...ALL_GROUPS].map(f => (
+        {[...(hasTodayOrFuture ? ['today'] : []), 'all', '🔥', ...ALL_GROUPS].map(f => (
           <button
             key={f}
             className={`${styles.chip} ${filter === f ? styles.active : ''}`}
