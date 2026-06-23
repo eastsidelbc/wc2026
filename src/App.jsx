@@ -9,16 +9,16 @@ import FunFacts from './components/FunFacts.jsx'
 import styles from './App.module.css'
 
 const TABS = [
-  { id: 'power',      label: 'Power Rankings' },
-  { id: 'groups',     label: 'Groups' },
   { id: 'schedule',   label: 'Schedule' },
+  { id: 'groups',     label: 'Groups' },
+  { id: 'power',      label: 'Power Rankings' },
   { id: 'leaderboard',label: 'Leaderboard' },
   { id: 'storylines', label: 'Storylines' },
   { id: 'funfacts',   label: 'Fun Facts' },
 ]
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('power')
+  const [activeTab, setActiveTab] = useState('schedule')
 
   return (
     <div className={styles.app}>
