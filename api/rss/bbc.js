@@ -27,13 +27,14 @@ function parseItems(xml, sourceName) {
   let m
   while ((m = re.exec(xml)) !== null) {
     const chunk = m[1]
-    const guid  = getTag(chunk, 'guid')
     const link  = getTag(chunk, 'link')
+    const guid  = getTag(chunk, 'guid')
+    const desc  = getTag(chunk, 'description')
     items.push({
       source:      sourceName,
       title:       getTag(chunk, 'title'),
-      description: getTag(chunk, 'description'),
-      link:        guid || link,
+      description: desc === 'null' ? '' : desc,
+      link:        link || (guid.startsWith('http') ? guid : ''),
       pubDate:     getTag(chunk, 'pubDate'),
     })
   }
@@ -45,6 +46,7 @@ function parseItems(xml, sourceName) {
 const EXCLUDE_KEYWORDS = ['premier league', 'champions league', 'la liga', 'serie a', 'bundesliga', 'transfer']
 
 function isRelevant(item) {
+  if (!item.title || !item.link) return false
   const text = `${item.title} ${item.description}`.toLowerCase()
   return !EXCLUDE_KEYWORDS.some(k => text.includes(k))
 }
