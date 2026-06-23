@@ -4,6 +4,24 @@ Format: [Date] — What changed and why
 
 ---
 
+## [2026-06-23] — Header, Position Badges, Tab Reorder, Disclaimer
+
+### Header date compacted
+- `Header.jsx`: `June 11 – July 19` → `6/11 – 7/19` to save horizontal space; host countries unchanged
+
+### Group position badge colors on schedule
+- Positions 1–2 render gold (advancing), positions 3–4 render faded/muted (eliminated/bubble) — mirrors Groups tab treatment
+- `Schedule.module.css`: split `.teamPos` into `.teamPosAdvancing` and `.teamPosFading`
+
+### Disclaimer banner on schedule
+- Blue info box above filter chips: "Numbers show each team's current position in their group"
+- `Schedule.module.css`: added `.disclaimer` matching blue info box style used elsewhere
+
+### Schedule first tab + default landing
+- `App.jsx`: Schedule moved to first tab; default `activeTab` changed from `'power'` to `'schedule'`
+
+---
+
 ## [2026-06-23] — Schedule UX, Group Position Badges, Tab Reorder
 
 ### Group position badges on match cards
