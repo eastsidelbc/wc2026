@@ -88,14 +88,34 @@
 .teamPos {
   font-size: 10px;
   font-weight: 700;
-  color: var(--muted);
-  background: rgba(255,255,255,0.06);
-  border: 1px solid var(--border);
   border-radius: 3px;
   padding: 0 4px;
   margin-left: 4px;
   vertical-align: middle;
   font-variant-numeric: tabular-nums;
+}
+
+.teamPosAdvancing {
+  color: var(--gold);
+  background: rgba(245,200,66,0.1);
+  border: 1px solid rgba(245,200,66,0.3);
+}
+
+.teamPosFading {
+  color: var(--muted);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  opacity: 0.5;
+}
+
+.disclaimer {
+  font-size: 11px;
+  color: #93c5fd;
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 8px;
+  padding: 7px 11px;
+  margin-bottom: 12px;
 }
 
 .liveScore {

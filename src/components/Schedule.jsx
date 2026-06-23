@@ -186,6 +186,10 @@ export default function Schedule() {
         </div>
       )}
 
+      <div className={styles.disclaimer}>
+        Numbers show each team's current position in their group
+      </div>
+
       <div className={styles.chips}>
         {[...(hasTodayOrFuture ? ['today'] : []), 'all', '🔥', ...ALL_GROUPS].map(f => (
           <button
@@ -228,7 +232,7 @@ export default function Schedule() {
                 <div className={styles.matchRow}>
                   <div className={styles.matchGroup}>G{m.group}</div>
                   <div className={styles.matchTeams}>
-                    <span>{m.home}{homePos && <span className={styles.teamPos}>{homePos}</span>}</span>
+                    <span>{m.home}{homePos && <span className={`${styles.teamPos} ${homePos <= 2 ? styles.teamPosAdvancing : styles.teamPosFading}`}>{homePos}</span>}</span>
                     {live
                       ? <span className={styles.liveScore}>
                           {live.competitors?.[0]?.score ?? '—'} – {live.competitors?.[1]?.score ?? '—'}
@@ -239,7 +243,7 @@ export default function Schedule() {
                           </span>
                         : <span className={styles.vs}>vs</span>
                     }
-                    <span>{m.away}{awayPos && <span className={styles.teamPos}>{awayPos}</span>}</span>
+                    <span>{m.away}{awayPos && <span className={`${styles.teamPos} ${awayPos <= 2 ? styles.teamPosAdvancing : styles.teamPosFading}`}>{awayPos}</span>}</span>
                   </div>
                   <div className={styles.matchMeta}>
                     {drama && hasScore
