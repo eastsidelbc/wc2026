@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { schedule, TEAM_NAME_MAP, STADIUM_ELEVATION } from '../data/static.js'
 import { useMatches } from '../hooks/useMatches.js'
+import { useStandings } from '../hooks/useStandings.js'
 import { useLiveScores } from '../hooks/useLiveScores.js'
 import { useEspnHeadlines } from '../hooks/useEspnHeadlines.js'
 import styles from './Schedule.module.css'
@@ -87,10 +88,20 @@ export default function Schedule() {
   const [filter,    setFilter]    = useState(hasTodayOrFuture ? 'today' : 'all')
   const [openMatch, setOpenMatch] = useState(null)
 
-  const { matches: zMatches }              = useMatches()
-  const { liveScores, isLive }             = useLiveScores([])
-  const { headlines, goalTypes, teamForms} = useEspnHeadlines()
+  const { matches: zMatches }               = useMatches()
+  const { standings }                       = useStandings()
+  const { liveScores, isLive }              = useLiveScores([])
+  const { headlines, goalTypes, teamForms } = useEspnHeadlines()
   const matchList = zMatches?.data ?? zMatches ?? []
+
+  // Flat map: Zafronix team name → group position (1–4)
+  const positionMap = useMemo(() => {
+    const map = {}
+    Object.values(standings).forEach(group => {
+      group.forEach(entry => { map[entry.team] = entry.position })
+    })
+    return map
+  }, [standings])
 
   const zLookup = useMemo(() => {
     const map = {}
@@ -159,6 +170,10 @@ export default function Schedule() {
     return teamForms[espnName(zName)] ?? null
   }
 
+  function getPosition(zName) {
+    return positionMap[zName] ?? null
+  }
+
   function toggleMatch(key) {
     setOpenMatch(prev => prev === key ? null : key)
   }
@@ -201,6 +216,8 @@ export default function Schedule() {
             const awayGoals = hasSplit ? zm.goals.filter(g => g.team === 'away') : []
             const homeForm  = getForm(zm?.homeTeam)
             const awayForm  = getForm(zm?.awayTeam)
+            const homePos   = zm ? getPosition(zm.homeTeam) : null
+            const awayPos   = zm ? getPosition(zm.awayTeam) : null
 
             return (
               <div
@@ -211,7 +228,7 @@ export default function Schedule() {
                 <div className={styles.matchRow}>
                   <div className={styles.matchGroup}>G{m.group}</div>
                   <div className={styles.matchTeams}>
-                    <span>{m.home}</span>
+                    <span>{m.home}{homePos && <span className={styles.teamPos}>{homePos}</span>}</span>
                     {live
                       ? <span className={styles.liveScore}>
                           {live.competitors?.[0]?.score ?? '—'} – {live.competitors?.[1]?.score ?? '—'}
@@ -222,7 +239,7 @@ export default function Schedule() {
                           </span>
                         : <span className={styles.vs}>vs</span>
                     }
-                    <span>{m.away}</span>
+                    <span>{m.away}{awayPos && <span className={styles.teamPos}>{awayPos}</span>}</span>
                   </div>
                   <div className={styles.matchMeta}>
                     {drama && hasScore
