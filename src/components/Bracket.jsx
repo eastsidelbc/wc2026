@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { groups, powerRankings, TEAM_NAME_MAP } from '../data/static.js'
 import { useBracket } from '../hooks/useBracket.js'
+import { useMatches } from '../hooks/useMatches.js'
 import { useLiveScores } from '../hooks/useLiveScores.js'
 import { splitGoalsByTeam, describeGoal, getVenue, useMatchHeadline } from './matchCard-helpers.js'
 import styles from './Bracket.module.css'
@@ -218,7 +219,7 @@ function GoalLine({ g, m, getGoalType, align }) {
   )
 }
 
-function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalType }) {
+function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalType, matchDetail }) {
   const homeName = m.home || m.homeTeam || null
   const awayName = m.away || m.awayTeam || null
   const finished = m.status === 'finished'
@@ -243,8 +244,11 @@ function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalTyp
   }
 
   const venue = getVenue(m)
-  const headline = finished ? getHeadline?.(m) : null
-  const { hasSplit, homeGoals, awayGoals } = splitGoalsByTeam(m.goals)
+  // Bracket endpoint match objects have no goals[] (only homeScore/awayScore) —
+  // fall back to the useMatches record for the same matchNo, which does.
+  const detail = matchDetail?.[m.matchNo] ?? m
+  const headline = finished ? getHeadline?.(detail) : null
+  const { hasSplit, homeGoals, awayGoals } = splitGoalsByTeam(detail.goals)
   const dateText = [formatMatchDate(m.date), m.status === 'scheduled' ? m.kickoff : null].filter(Boolean).join(' · ')
 
   return (
@@ -271,19 +275,19 @@ function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalTyp
         {upset && <span className={styles.badgeUpset}>🚨 Upset</span>}
       </div>
 
-      {finished && m.goals?.length > 0 && (
+      {finished && detail.goals?.length > 0 && (
         hasSplit ? (
           <div className={styles.goalsSplit}>
             <div className={styles.goalsCol}>
-              {homeGoals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="home" />)}
+              {homeGoals.map((g, gi) => <GoalLine key={gi} g={g} m={detail} getGoalType={getGoalType} align="home" />)}
             </div>
             <div className={styles.goalsCol}>
-              {awayGoals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="away" />)}
+              {awayGoals.map((g, gi) => <GoalLine key={gi} g={g} m={detail} getGoalType={getGoalType} align="away" />)}
             </div>
           </div>
         ) : (
           <div className={styles.goalsFlat}>
-            {m.goals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="home" />)}
+            {detail.goals.map((g, gi) => <GoalLine key={gi} g={g} m={detail} getGoalType={getGoalType} align="home" />)}
           </div>
         )
       )}
@@ -297,7 +301,7 @@ function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalTyp
 // score always visible; tap to expand scorers/headline/venue/kickoff. No
 // FIFA 3-letter codes: we have no verified code list in this codebase and
 // didn't want to guess wrong ones.
-function CompactMatchCard({ match: m, live, bracket, winnerMap, getHeadline, getGoalType, isOpen, onToggle }) {
+function CompactMatchCard({ match: m, live, bracket, winnerMap, getHeadline, getGoalType, matchDetail, isOpen, onToggle }) {
   const homeName = m.home || m.homeTeam || null
   const awayName = m.away || m.awayTeam || null
   const finished = m.status === 'finished'
@@ -312,8 +316,11 @@ function CompactMatchCard({ match: m, live, bracket, winnerMap, getHeadline, get
   }
 
   const venue = getVenue(m)
-  const headline = finished ? getHeadline?.(m) : null
-  const { hasSplit, homeGoals, awayGoals } = splitGoalsByTeam(m.goals)
+  // Bracket endpoint match objects have no goals[] (only homeScore/awayScore) —
+  // fall back to the useMatches record for the same matchNo, which does.
+  const detail = matchDetail?.[m.matchNo] ?? m
+  const headline = finished ? getHeadline?.(detail) : null
+  const { hasSplit, homeGoals, awayGoals } = splitGoalsByTeam(detail.goals)
   const dateText = [formatMatchDate(m.date, false), m.status === 'scheduled' ? m.kickoff : null].filter(Boolean).join(' · ')
 
   return (
@@ -352,19 +359,19 @@ function CompactMatchCard({ match: m, live, bracket, winnerMap, getHeadline, get
             <div className={styles.compactKickoff}>🕐 {m.kickoff}</div>
           )}
 
-          {m.goals?.length > 0 && (
+          {detail.goals?.length > 0 && (
             hasSplit ? (
               <div className={styles.goalsSplit}>
                 <div className={styles.goalsCol}>
-                  {homeGoals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="home" />)}
+                  {homeGoals.map((g, gi) => <GoalLine key={gi} g={g} m={detail} getGoalType={getGoalType} align="home" />)}
                 </div>
                 <div className={styles.goalsCol}>
-                  {awayGoals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="away" />)}
+                  {awayGoals.map((g, gi) => <GoalLine key={gi} g={g} m={detail} getGoalType={getGoalType} align="away" />)}
                 </div>
               </div>
             ) : (
               <div className={styles.goalsFlat}>
-                {m.goals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="home" />)}
+                {detail.goals.map((g, gi) => <GoalLine key={gi} g={g} m={detail} getGoalType={getGoalType} align="home" />)}
               </div>
             )
           )}
@@ -399,6 +406,20 @@ export default function Bracket() {
   const { liveScores } = useLiveScores(currentMatches)
   const winnerMap = useMemo(() => buildWinnerMap(bracket), [bracket])
   const { getHeadline, getGoalType } = useMatchHeadline()
+
+  // /bracket match objects have no goals[] (only homeScore/awayScore) — /matches
+  // does, keyed by the same matchNo. This lookup lets cards borrow goal detail
+  // from useMatches while keeping bracket structure (refs, winner/loser) from
+  // the bracket endpoint.
+  const { matches: fullMatches } = useMatches()
+  const matchDetail = useMemo(() => {
+    const list = fullMatches?.data ?? fullMatches ?? []
+    const map = {}
+    list.forEach(fm => {
+      if (fm.matchNo != null) map[fm.matchNo] = fm
+    })
+    return map
+  }, [fullMatches])
 
   function getLiveScore(m) {
     if (!liveScores.length) return null
@@ -489,6 +510,7 @@ export default function Bracket() {
               bracket={bracket}
               getHeadline={getHeadline}
               getGoalType={getGoalType}
+              matchDetail={matchDetail}
             />
           ))}
         </>
@@ -520,6 +542,7 @@ export default function Bracket() {
                           winnerMap={winnerMap}
                           getHeadline={getHeadline}
                           getGoalType={getGoalType}
+                          matchDetail={matchDetail}
                           isOpen={openMatchKey === matchKey(m)}
                           onToggle={() => toggleCompactMatch(matchKey(m))}
                         />

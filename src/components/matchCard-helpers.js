@@ -91,15 +91,15 @@ export function useMatchHeadline() {
 
   function getHeadline(zm) {
     if (!zm) return null
-    const home = espnName(zm.homeTeam)
-    const away = espnName(zm.awayTeam)
+    const home = espnName(zm.home ?? zm.homeTeam)
+    const away = espnName(zm.away ?? zm.awayTeam)
     return headlines[`${home}|${away}`] ?? headlines[`${away}|${home}`] ?? null
   }
 
   function getGoalType(zm, minute) {
     if (!zm) return null
-    const home = espnName(zm.homeTeam)
-    const away = espnName(zm.awayTeam)
+    const home = espnName(zm.home ?? zm.homeTeam)
+    const away = espnName(zm.away ?? zm.awayTeam)
     const map  = goalTypes[`${home}|${away}`] ?? goalTypes[`${away}|${home}`]
     return map?.[minute] ?? null
   }
