@@ -6,7 +6,7 @@
 const ZAFRONIX_BASE = 'https://api.zafronix.com/fifa/worldcup/v1'
 
 // Allowed first path segments — prevents open-proxy abuse
-const ALLOWED = new Set(['matches', 'standings', 'scorers', 'players', 'teams', 'on-this-day', 'trivia'])
+const ALLOWED = new Set(['matches', 'standings', 'scorers', 'players', 'teams', 'on-this-day', 'trivia', 'bracket'])
 
 // Endpoints where we can afford a longer CDN cache
 const SLOW = new Set(['standings', 'scorers'])

@@ -1,27 +1,16 @@
 import { useState } from 'react'
 import { useEspnLeaderboard } from '../hooks/useEspnLeaderboard.js'
 import { useCleanSheets } from '../hooks/useCleanSheets.js'
-import { groups } from '../data/static.js'
+import { groups, TEAM_NAME_MAP } from '../data/static.js'
 import styles from './Leaderboard.module.css'
 
 const TABS = ['Goals', 'Assists', 'Cards', 'Clean Sheets']
-
-// Zafronix team names that differ from the static display names in groups data
-const ZAFRONIX_ALIASES = {
-  'South Korea':    'Korea Republic',
-  'Bosnia & Herz.': 'Bosnia and Herzegovina',
-  'Turkey':         'Türkiye',
-  'Ivory Coast':    "Côte d'Ivoire",
-  'Cape Verde':     'Cabo Verde',
-  'Iran':           'IR Iran',
-  'DR Congo':       'Congo DR',
-}
 
 const FLAG_MAP = {}
 for (const g of groups) {
   for (const t of g.teams) {
     FLAG_MAP[t.name] = t.flag
-    if (ZAFRONIX_ALIASES[t.name]) FLAG_MAP[ZAFRONIX_ALIASES[t.name]] = t.flag
+    if (TEAM_NAME_MAP[t.name]) FLAG_MAP[TEAM_NAME_MAP[t.name]] = t.flag
   }
 }
 

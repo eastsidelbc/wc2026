@@ -1,16 +1,6 @@
 import { useState } from 'react'
-import { powerRankings } from '../data/static.js'
+import { powerRankings, odds as ODDS } from '../data/static.js'
 import styles from './PowerRankings.module.css'
-
-const ODDS = [
-  { flag: '🇪🇸', name: 'Spain',     odds: '+450' },
-  { flag: '🇫🇷', name: 'France',    odds: '+500' },
-  { flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', name: 'England',   odds: '+650' },
-  { flag: '🇧🇷', name: 'Brazil',    odds: '+850' },
-  { flag: '🇦🇷', name: 'Argentina', odds: '+900' },
-  { flag: '🇩🇪', name: 'Germany',   odds: '+1000' },
-  { flag: '🇵🇹', name: 'Portugal',  odds: '+1100' },
-]
 
 export default function PowerRankings() {
   const [openRank, setOpenRank] = useState(null)

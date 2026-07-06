@@ -4,6 +4,19 @@ Format: [Date] — What changed and why
 
 ---
 
+## [2026-07-06] — Static Data Consolidation, Dead Hook Cleanup, Skills Setup
+
+### Team name aliases and odds moved to static data
+- `Leaderboard.jsx`: removed inline `ZAFRONIX_ALIASES` map; now imports `TEAM_NAME_MAP` from `data/static.js` — single source of truth for Zafronix ↔ display name mismatches, shared across components
+- `PowerRankings.jsx`: removed inline `ODDS` array; now imports `odds` from `data/static.js`
+
+### Dead hook removal
+- Deleted `src/hooks/useRoster.js` and `src/hooks/useScorers.js` — no remaining imports found in `src/`; superseded by `useEspnLeaderboard` and `useCleanSheets`
+
+### Tooling
+- Added Claude Code project skill `.claude/skills/session-end/SKILL.md` — automates this end-of-session changelog/PROJECT.md update step
+- Added `docs/STYLE-GUIDE.md` and root `README.md` (untracked, not yet reviewed for content)
+
 ## [2026-06-23] — Header, Position Badges, Tab Reorder, Disclaimer
 
 ### Header date compacted

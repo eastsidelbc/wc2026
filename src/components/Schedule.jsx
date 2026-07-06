@@ -1,33 +1,16 @@
 import { useState, useMemo } from 'react'
-import { schedule, TEAM_NAME_MAP, STADIUM_ELEVATION } from '../data/static.js'
+import { schedule, TEAM_NAME_MAP } from '../data/static.js'
 import { useMatches } from '../hooks/useMatches.js'
 import { useStandings } from '../hooks/useStandings.js'
 import { useLiveScores } from '../hooks/useLiveScores.js'
-import { useEspnHeadlines } from '../hooks/useEspnHeadlines.js'
+import { formDots, getDrama, splitGoalsByTeam, describeGoal, getVenue, useMatchHeadline } from './matchCard-helpers.js'
 import styles from './Schedule.module.css'
 
 const NAME_MAP = TEAM_NAME_MAP
-const REVERSE_NAME_MAP = Object.fromEntries(
-  Object.entries(TEAM_NAME_MAP).map(([k, v]) => [v, k])
-)
-
-const ESPN_NAME_MAP = {
-  'USA':              'United States',
-  'Korea Republic':   'South Korea',
-  'IR Iran':          'Iran',
-  'Congo DR':         'DR Congo',
-  'Cabo Verde':       'Cape Verde',
-  'Türkiye':          'Turkey',
-  'Bosnia and Herzegovina': 'Bosnia-Herzegovina',
-}
 
 function teamKey(str) {
   const bare = str.split(' ').slice(1).join(' ')
   return NAME_MAP[bare] ?? bare
-}
-
-function espnName(zName) {
-  return ESPN_NAME_MAP[zName] ?? REVERSE_NAME_MAP[zName] ?? zName
 }
 
 // Match the date format used in static schedule: "Jun 23 (Mon)"
@@ -48,42 +31,6 @@ const TODAY_D   = parseScheduleDate(TODAY)
 // Show Today chip whenever any matches remain (today or future)
 const hasTodayOrFuture = schedule.some(m => parseScheduleDate(m.date) >= TODAY_D)
 
-// ESPN goal type text → short badge label (null = don't show)
-function goalTypeBadge(typeText) {
-  if (!typeText) return null
-  if (typeText === 'Goal - Header')    return 'Header'
-  if (typeText === 'Goal - Volley')    return 'Volley'
-  if (typeText === 'Goal - Free-kick') return 'FK'
-  return null
-}
-
-// Form string "WWDLL" → last 3 chars as dot array
-function formDots(formStr) {
-  if (!formStr) return []
-  return formStr.slice(-3).split('')
-}
-
-// Drama score from Zafronix match data
-function getDrama(zm) {
-  if (!zm || zm.homeScore == null) return null
-  let score = 0
-  const reds      = (zm.cards  ?? []).filter(c => c.color === 'red').length
-  const lateGoals = (zm.goals  ?? []).filter(g => g.minute >= 80 || g.addedMinute).length
-  const total     = (zm.homeScore ?? 0) + (zm.awayScore ?? 0)
-  const margin    = Math.abs((zm.homeScore ?? 0) - (zm.awayScore ?? 0))
-
-  score += reds      * 2
-  score += lateGoals * 2
-  if (margin === 0) score += 3
-  else if (margin === 1) score += 1
-  if (total >= 4)   score += 2
-
-  if (score >= 8) return { label: 'Chaos',    emoji: '💥' }
-  if (score >= 5) return { label: 'Thriller', emoji: '🔥' }
-  if (score >= 3) return { label: 'Lively',   emoji: '⚡' }
-  return null
-}
-
 export default function Schedule() {
   const [filter,    setFilter]    = useState(hasTodayOrFuture ? 'today' : 'all')
   const [openMatch, setOpenMatch] = useState(null)
@@ -91,7 +38,7 @@ export default function Schedule() {
   const { matches: zMatches }               = useMatches()
   const { standings }                       = useStandings()
   const { liveScores, isLive }              = useLiveScores([])
-  const { headlines, goalTypes, teamForms } = useEspnHeadlines()
+  const { getHeadline, getGoalType, getForm } = useMatchHeadline()
   const matchList = zMatches?.data ?? zMatches ?? []
 
   // Flat map: Zafronix team name → group position (1–4)
@@ -151,25 +98,6 @@ export default function Schedule() {
     return zLookup[`${teamKey(match.home)}|${teamKey(match.away)}`] || null
   }
 
-  function getHeadline(zm) {
-    if (!zm) return null
-    const home = espnName(zm.homeTeam)
-    const away = espnName(zm.awayTeam)
-    return headlines[`${home}|${away}`] ?? headlines[`${away}|${home}`] ?? null
-  }
-
-  function getGoalType(zm, minute) {
-    if (!zm) return null
-    const home = espnName(zm.homeTeam)
-    const away = espnName(zm.awayTeam)
-    const map  = goalTypes[`${home}|${away}`] ?? goalTypes[`${away}|${home}`]
-    return map?.[minute] ?? null
-  }
-
-  function getForm(zName) {
-    return teamForms[espnName(zName)] ?? null
-  }
-
   function getPosition(zName) {
     return positionMap[zName] ?? null
   }
@@ -209,15 +137,12 @@ export default function Schedule() {
             const live      = getLiveScore(m)
             const zm        = getZMatch(m)
             const hasScore  = zm && (zm.homeScore != null || zm.awayScore != null)
-            const venue     = zm ? [zm.city, zm.stadium].filter(Boolean).join(' · ') : null
-            const elevation = zm?.stadiumId ? STADIUM_ELEVATION[zm.stadiumId] : null
+            const venue     = getVenue(zm)
             const matchKey  = `${date}-${i}`
             const isOpen    = openMatch === matchKey
             const headline  = getHeadline(zm)
             const drama     = getDrama(zm)
-            const hasSplit  = zm?.goals?.some(g => g.team === 'home' || g.team === 'away') ?? false
-            const homeGoals = hasSplit ? zm.goals.filter(g => g.team === 'home') : []
-            const awayGoals = hasSplit ? zm.goals.filter(g => g.team === 'away') : []
+            const { hasSplit, homeGoals, awayGoals } = splitGoalsByTeam(zm?.goals)
             const homeForm  = getForm(zm?.homeTeam)
             const awayForm  = getForm(zm?.awayTeam)
             const homePos   = zm ? getPosition(zm.homeTeam) : null
@@ -272,17 +197,13 @@ export default function Schedule() {
                 )}
 
                 {venue && !isOpen && (
-                  <div className={styles.matchVenue}>
-                    {venue}{elevation ? ` ⛰️ ${elevation.toLocaleString()}m` : ''}
-                  </div>
+                  <div className={styles.matchVenue}>{venue}</div>
                 )}
 
                 <div className={styles.recapExpand}>
                   <div className={styles.recapInner}>
                     {venue && (
-                      <div className={styles.recapVenue}>
-                        📍 {venue}{elevation ? ` ⛰️ ${elevation.toLocaleString()}m` : ''}
-                      </div>
+                      <div className={styles.recapVenue}>📍 {venue}</div>
                     )}
 
                     {zm?.goals?.length > 0 && (
@@ -291,10 +212,7 @@ export default function Schedule() {
                           <div className={`${styles.recapGoalCol} ${styles.recapGoalColHome}`}>
                             <div className={styles.recapGoalColHeader}>{m.home}</div>
                             {homeGoals.map((g, gi) => {
-                              const isOG   = g.type === 'own_goal'
-                              const isPen  = g.type === 'penalty'
-                              const min    = g.addedMinute ? `${g.minute}+${g.addedMinute}` : `${g.minute}`
-                              const badge  = !isOG && !isPen ? goalTypeBadge(getGoalType(zm, g.minute)) : null
+                              const { minute: min, isOG, isPen, badge } = describeGoal(g, zm, getGoalType)
                               return (
                                 <div key={gi} className={styles.recapGoalHome}>
                                   <span className={styles.recapScorerName}>
@@ -313,10 +231,7 @@ export default function Schedule() {
                           <div className={`${styles.recapGoalCol} ${styles.recapGoalColAway}`}>
                             <div className={styles.recapGoalColHeader}>{m.away}</div>
                             {awayGoals.map((g, gi) => {
-                              const isOG   = g.type === 'own_goal'
-                              const isPen  = g.type === 'penalty'
-                              const min    = g.addedMinute ? `${g.minute}+${g.addedMinute}` : `${g.minute}`
-                              const badge  = !isOG && !isPen ? goalTypeBadge(getGoalType(zm, g.minute)) : null
+                              const { minute: min, isOG, isPen, badge } = describeGoal(g, zm, getGoalType)
                               return (
                                 <div key={gi} className={styles.recapGoalAway}>
                                   <span className={styles.recapMinuteSplit}>
@@ -336,10 +251,7 @@ export default function Schedule() {
                       ) : (
                         <div className={styles.recapGoals}>
                           {zm.goals.map((g, gi) => {
-                            const isOG  = g.type === 'own_goal'
-                            const isPen = g.type === 'penalty'
-                            const min   = g.addedMinute ? `${g.minute}+${g.addedMinute}` : `${g.minute}`
-                            const badge = !isOG && !isPen ? goalTypeBadge(getGoalType(zm, g.minute)) : null
+                            const { minute: min, isOG, isPen, badge } = describeGoal(g, zm, getGoalType)
                             return (
                               <div key={gi} className={styles.recapGoalRow}>
                                 <span className={styles.recapMinute}>{min}'</span>

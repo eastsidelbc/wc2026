@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "agents/AGENT-CONTENT.md",
+                "file": "ZAFRONIX-API.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "AGENT-CONTENT"
+              "title": "ZAFRONIX-API"
             }
           }
         ]
@@ -185,6 +185,10 @@
   },
   "active": "6bd155724bb9ebb6",
   "lastOpenFiles": [
-    "PROJECT.md"
+    "2026-06-24.md",
+    "ZAFRONIX-API.md",
+    "STYLE-GUIDE.md",
+    "PROJECT.md",
+    "agents/AGENT-CONTENT.md"
   ]
 }

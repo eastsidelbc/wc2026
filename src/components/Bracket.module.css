@@ -1,0 +1,343 @@
+.viewToggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.viewBtn {
+  flex: 1;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--subtext);
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.15s;
+}
+
+.viewBtnActive {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--card);
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 4px 0 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+}
+
+.chip {
+  flex: none;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--subtext);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+.chip.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--card);
+}
+
+.matchCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 14px;
+  margin-bottom: 10px;
+  transition: all 0.15s;
+}
+
+.matchTeams {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.teamRow {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.winner {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.loser {
+  color: var(--muted);
+}
+
+.neutral {
+  color: var(--text);
+}
+
+.tbdRef {
+  color: var(--subtext);
+  font-size: 13px;
+}
+
+.score {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--subtext);
+  padding: 2px 0;
+}
+
+.vs {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.venue {
+  font-size: 12px;
+  color: var(--subtext);
+  margin-top: 6px;
+}
+
+.badgeRow {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.badgeLive {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--red);
+  background: rgba(239, 68, 68, 0.12);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+
+.badgeDone {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+
+.badgeUpcoming {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--subtext);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+
+.badgeUpset {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--fire);
+  background: rgba(255, 107, 53, 0.12);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+
+.loading,
+.error,
+.empty {
+  text-align: center;
+  color: var(--subtext);
+  padding: 24px 0;
+  font-size: 14px;
+}
+
+.error {
+  color: var(--red);
+}
+
+.goalsSplit {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.goalsFlat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.goalsCol:first-child {
+  padding-right: 10px;
+  border-right: 1px solid var(--border);
+}
+
+.goalsCol:last-child {
+  padding-left: 10px;
+}
+
+.goalRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.goalScorer {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goalMinute {
+  color: var(--gold);
+  font-weight: 700;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.goalBadge {
+  font-size: 9px;
+  color: var(--subtext);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 4px;
+  margin-left: 4px;
+}
+
+.headline {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--subtext);
+  line-height: 1.5;
+  border-left: 2px solid var(--gold);
+  padding-left: 8px;
+  margin-top: 8px;
+}
+
+.fallbackHint {
+  font-size: 12px;
+  color: var(--subtext);
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+}
+
+/* Bracket view — horizontal-scroll columns with SVG connectors */
+.bracketScroll {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  overflow-x: auto;
+  max-width: 100%;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: 8px;
+}
+
+.connectorSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.connectorPath {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+
+.bracketColumn {
+  position: relative;
+  flex: none;
+  min-width: 140px;
+  width: 140px;
+  scroll-snap-align: center;
+  padding: 0 6px;
+}
+
+.bracketColHeader {
+  position: sticky;
+  top: 60px;
+  z-index: 5;
+  background: var(--bg);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 6px 0;
+}
+
+.compactCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.compactRow {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 0;
+}
+
+.compactName {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compactWinner {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.compactLoser {
+  color: var(--muted);
+}
+
+.compactNeutral {
+  color: var(--text);
+}
+
+.compactScore {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--subtext);
+  text-align: center;
+  padding: 2px 0;
+}
+
+.compactEmpty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 12px 0;
+}

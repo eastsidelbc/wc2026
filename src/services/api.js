@@ -19,7 +19,7 @@
 // Match results        → Zafronix /matches (primary) + ESPN (fallback)
 // Group standings      → Zafronix /standings
 // Stadium + city       → Zafronix /stadiums
-// Bracket              → Zafronix /bracket (future)
+// Bracket              → Zafronix /bracket
 // Scorers backup       → Zafronix /matches goals[] array (fallback if ESPN down)
 // ============================================================
 
@@ -38,6 +38,12 @@ const HEADERS = isDev
 export async function fetchMatches(year = 2026) {
   const res = await fetch(`${BASE}/matches?year=${year}`, { headers: HEADERS })
   if (!res.ok) throw new Error('Zafronix matches failed')
+  return res.json()
+}
+
+export async function fetchBracket(year = 2026) {
+  const res = await fetch(`${BASE}/bracket?year=${year}`, { headers: HEADERS })
+  if (!res.ok) throw new Error('Zafronix bracket failed')
   return res.json()
 }
 

@@ -34,13 +34,12 @@ Built to be used during the tournament (Jun 11 – Jul 19, 2026).
 | Fun Facts | Zafronix on-this-day + trivia | ✅ Done |
 
 ## Current Status
-🔲 Project scaffolded, not yet pushed to GitHub
-🔲 `bun install` not yet run
-🔲 Zafronix key not yet added to .env.local
-🔲 Vercel not yet connected
+✅ Pushed to GitHub, live development ongoing
+✅ Static data consolidated (team name aliases + odds moved into `data/static.js`)
+✅ Dead hooks (`useRoster.js`, `useScorers.js`) removed
 
 ## Repo
-- GitHub: https://github.com/YOUR_USERNAME/wc2026
+- GitHub: https://github.com/eastsidelbc/wc2026
 - Vercel: https://wc2026.vercel.app (once connected)
 
 ## How to Start a Session
