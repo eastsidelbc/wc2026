@@ -4,6 +4,29 @@ Format: [Date] — What changed and why
 
 ---
 
+## [2026-07-06] — Knockout Bracket Feature (API-driven)
+
+### API wiring
+- `api/zafronix/[...path].js`: added `bracket` to the proxy `ALLOWED` set
+- `src/services/api.js`: added `fetchBracket(year)` mirroring `fetchMatches`
+- `src/hooks/useBracket.js`: new hook, sessionStorage cache (5min TTL), no fallback source exists for bracket data (documented tradeoff)
+
+### New Bracket tab
+- `src/components/Bracket.jsx` / `Bracket.module.css`: full knockout bracket UI, now first tab in nav
+- Client-side TBD placeholder resolution for unplayed rounds (`W73`/`1A`-style refs), recursively resolving through nested unplayed matches instead of showing raw match numbers
+- List/Bracket view toggle — List is a vertical stack (reuses scorer/venue/headline rendering); Bracket is a horizontal-scroll per-round layout with pure-CSS connector lines between rounds (no SVG/JS measurement — tried that first, it was fragile and desynced; replaced with CSS custom-property-driven pseudo-elements)
+- Bracket-view-only short-name lookup (`Bosnia and Herzegovina` → `Bosnia`, etc.) so long team names don't truncate in the narrow compact cards; list view still shows full names
+
+### Shared logic extraction
+- `src/components/matchCard-helpers.js`: pulled goal-scorer formatting, venue+elevation, ESPN headline lookup, drama/form helpers out of `Schedule.jsx` so `Bracket.jsx` reuses them instead of duplicating
+
+### Bug fixes (two rounds, both via read-fix-build-verify loops)
+- Round 1: SVG connector lines drawing incorrectly, column layout misaligned, round-chip row's `sticky` colliding with the app header's identical `top:0;z-index:100` and painting over it
+- Round 2: per-column round-label headers were *also* sticky, all six pinning to the same y-position and floating over scrolling cards; columns too narrow (140px) for long names; vertical rhythm between rounds used `justify-content:space-around` which grew non-linearly (16px→151px→420px) instead of true doubling — replaced with explicit `--round-gap`/`--round-offset` CSS custom properties shared between card layout and connector math
+
+### Known limitation
+- None of the Bracket UI has been visually verified in an actual browser this session (no dev server/browser access in this environment) — verified via build success, code review, and hand-worked CSS/geometry math only. Recommend a live check before considering it done, especially the connector-line positions and SF/Final area spacing.
+
 ## [2026-07-06] — Static Data Consolidation, Dead Hook Cleanup, Skills Setup
 
 ### Team name aliases and odds moved to static data

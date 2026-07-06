@@ -109,6 +109,12 @@
   font-weight: 400;
 }
 
+.matchDate {
+  font-size: 12px;
+  color: var(--subtext);
+  margin-top: 6px;
+}
+
 .venue {
   font-size: 12px;
   color: var(--subtext);
@@ -248,14 +254,13 @@
 }
 
 /* Bracket view — horizontal-scroll columns, pure-CSS bracket-tree connectors.
-   No SVG/JS measurement: card height (70px — bumped from 54px so 13px team
-   names + score actually fit) is a fixed constant, and each round's
-   --round-gap/--round-offset below are precomputed so the "pitch" (card
-   height + gap) exactly doubles every round (80 -> 160 -> 320 -> 640). That
-   doubling, PLUS the growing top offset, is what actually centers each
-   round's card on its two parents — gap alone isn't sufficient. Connector
-   pseudo-elements reference the same --round-gap so lines and cards can't
-   drift apart. */
+   No SVG/JS measurement: card height (88px — bumped from 70px so the added
+   date line still fits) is a fixed constant, and each round's --round-gap/
+   --round-offset below are precomputed so the "pitch" (card height + gap)
+   exactly doubles every round (98 -> 196 -> 392 -> 784). That doubling, PLUS
+   the growing top offset, is what actually centers each round's card on its
+   two parents — gap alone isn't sufficient. Connector pseudo-elements
+   reference the same --round-gap so lines and cards can't drift apart. */
 .bracketScroll {
   position: relative;
   display: flex;
@@ -280,11 +285,11 @@
 }
 
 .roundR32    { --round-gap: 10px;  --round-offset: 0px; }
-.roundR16    { --round-gap: 90px;  --round-offset: 40px; }
-.roundQF     { --round-gap: 250px; --round-offset: 80px; }
-.roundSF     { --round-gap: 570px; --round-offset: 160px; }
+.roundR16    { --round-gap: 108px; --round-offset: 49px; }
+.roundQF     { --round-gap: 304px; --round-offset: 98px; }
+.roundSF     { --round-gap: 696px; --round-offset: 196px; }
 .roundThird  { --round-gap: 0px;   --round-offset: 40px; }
-.roundFinal  { --round-gap: 0px;   --round-offset: 480px; }
+.roundFinal  { --round-gap: 0px;   --round-offset: 588px; }
 
 .bracketColHeader {
   /* Plain block — no longer sticky. Six of these exist side by side (one
@@ -316,14 +321,14 @@
   gap: var(--round-gap);
 }
 
-/* Vertical bar joining a pair's two cards. card1 mid = 35px (half of the
-   fixed 70px card height). card2 mid = 70 + gap + 35. Bar spans between
-   the two, so height = 70 + gap. */
+/* Vertical bar joining a pair's two cards. card1 mid = 44px (half of the
+   fixed 88px card height). card2 mid = 88 + gap + 44. Bar spans between
+   the two, so height = 88 + gap. */
 .pairConnected::before {
   content: '';
   position: absolute;
-  top: 35px;
-  height: calc(70px + var(--round-gap));
+  top: 44px;
+  height: calc(88px + var(--round-gap));
   right: -6px;
   width: 1px;
   background: var(--border);
@@ -333,7 +338,7 @@
 .pairConnected::after {
   content: '';
   position: absolute;
-  top: calc(35px + (70px + var(--round-gap)) / 2);
+  top: calc(44px + (88px + var(--round-gap)) / 2);
   right: -18px;
   width: 18px;
   height: 1px;
@@ -345,10 +350,10 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 6px 10px;
-  height: 70px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 2px;
+  cursor: pointer;
 }
 
 .compactRow {
@@ -385,9 +390,46 @@
   padding: 2px 0;
 }
 
+.compactDate {
+  font-size: 10px;
+  color: var(--subtext);
+  text-align: center;
+}
+
 .compactEmpty {
   text-align: center;
   color: var(--muted);
   font-size: 11px;
   padding: 12px 0;
+}
+
+/* Tap-to-expand accordion — same max-height/opacity pattern as Schedule.jsx's
+   .recapExpand/.recapInner. Card height is auto (not fixed) so this can grow;
+   collapsed cards still land at their natural ~70px compact height, which is
+   what the connector-line math above assumes. */
+.compactExpand {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.28s ease, opacity 0.2s ease;
+}
+
+.compactExpandOpen {
+  max-height: 400px;
+  opacity: 1;
+  margin-top: 4px;
+}
+
+.compactExpandInner {
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.compactVenue,
+.compactKickoff {
+  font-size: 11px;
+  color: var(--subtext);
 }

@@ -26,6 +26,7 @@ Built to be used during the tournament (Jun 11 – Jul 19, 2026).
 ## Tabs / Features
 | Tab | Data Source | Status |
 |---|---|---|
+| Bracket | Zafronix `/bracket` (API-driven, no static data) | ✅ List + horizontal Bracket view, TBD resolution, not yet visually verified in a browser |
 | Power Rankings | Static (`src/data/static.js`) | ✅ Done |
 | Groups | Static + Zafronix standings | ✅ Live standings + verdict badges wired |
 | Schedule | Static + Zafronix + ESPN | ✅ Scores, venue, match recap accordion |
@@ -37,6 +38,8 @@ Built to be used during the tournament (Jun 11 – Jul 19, 2026).
 ✅ Pushed to GitHub, live development ongoing
 ✅ Static data consolidated (team name aliases + odds moved into `data/static.js`)
 ✅ Dead hooks (`useRoster.js`, `useScorers.js`) removed
+✅ Knockout Bracket tab built end-to-end (API wiring, component, two rounds of bug fixes) — see `docs/BRACKET-PLAN.md` and CHANGELOG for detail
+🔲 Bracket UI not yet checked in an actual browser — do this before calling it done
 
 ## Repo
 - GitHub: https://github.com/eastsidelbc/wc2026

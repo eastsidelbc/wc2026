@@ -81,6 +81,19 @@ function scoreSuffix(m) {
   return ''
 }
 
+// Zafronix's bracket match date is a raw ISO string ("2026-06-11"), unlike
+// Schedule.jsx's pre-formatted static strings — needs its own formatting.
+function formatMatchDate(dateStr, withWeekday = true) {
+  if (!dateStr) return null
+  const d = new Date(`${dateStr}T00:00:00`)
+  if (Number.isNaN(d.getTime())) return null
+  const month = d.toLocaleDateString('en-US', { month: 'short' })
+  const day = d.getDate()
+  if (!withWeekday) return `${month} ${day}`
+  const weekday = d.toLocaleDateString('en-US', { weekday: 'short' })
+  return `${month} ${day} (${weekday})`
+}
+
 function matchKey(m) {
   return String(m.id ?? m.matchNo)
 }
@@ -185,6 +198,26 @@ function getDisplayTeam(name, teamRef, bracket, winnerMap) {
   return { displayName, label: displayName ? null : resolved.label }
 }
 
+// Shared by MatchCard (list view) and CompactMatchCard (bracket view) so goal
+// rendering isn't duplicated between the two card variants.
+function GoalLine({ g, m, getGoalType, align }) {
+  const { minute, isOG, isPen, badge } = describeGoal(g, m, getGoalType)
+  const scorerText = (
+    <span className={styles.goalScorer}>
+      {g.scorer}
+      {isOG && ' (OG)'}
+      {isPen && ' (P)'}
+      {badge && <span className={styles.goalBadge}>{badge}</span>}
+    </span>
+  )
+  const minuteText = <span className={styles.goalMinute}>{minute}'</span>
+  return (
+    <div className={styles.goalRow}>
+      {align === 'away' ? <>{minuteText}{scorerText}</> : <>{scorerText}{minuteText}</>}
+    </div>
+  )
+}
+
 function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalType }) {
   const homeName = m.home || m.homeTeam || null
   const awayName = m.away || m.awayTeam || null
@@ -212,24 +245,7 @@ function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalTyp
   const venue = getVenue(m)
   const headline = finished ? getHeadline?.(m) : null
   const { hasSplit, homeGoals, awayGoals } = splitGoalsByTeam(m.goals)
-
-  function GoalLine({ g, align }) {
-    const { minute, isOG, isPen, badge } = describeGoal(g, m, getGoalType)
-    const scorerText = (
-      <span className={styles.goalScorer}>
-        {g.scorer}
-        {isOG && ' (OG)'}
-        {isPen && ' (P)'}
-        {badge && <span className={styles.goalBadge}>{badge}</span>}
-      </span>
-    )
-    const minuteText = <span className={styles.goalMinute}>{minute}'</span>
-    return (
-      <div className={styles.goalRow}>
-        {align === 'away' ? <>{minuteText}{scorerText}</> : <>{scorerText}{minuteText}</>}
-      </div>
-    )
-  }
+  const dateText = [formatMatchDate(m.date), m.status === 'scheduled' ? m.kickoff : null].filter(Boolean).join(' · ')
 
   return (
     <div className={styles.matchCard}>
@@ -245,6 +261,7 @@ function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalTyp
         <TeamRow name={awayName} teamRef={m.awayRef} winnerMap={winnerMap} />
       </div>
 
+      {dateText && <div className={styles.matchDate}>{dateText}</div>}
       {venue && <div className={styles.venue}>{venue}</div>}
 
       <div className={styles.badgeRow}>
@@ -258,15 +275,15 @@ function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalTyp
         hasSplit ? (
           <div className={styles.goalsSplit}>
             <div className={styles.goalsCol}>
-              {homeGoals.map((g, gi) => <GoalLine key={gi} g={g} align="home" />)}
+              {homeGoals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="home" />)}
             </div>
             <div className={styles.goalsCol}>
-              {awayGoals.map((g, gi) => <GoalLine key={gi} g={g} align="away" />)}
+              {awayGoals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="away" />)}
             </div>
           </div>
         ) : (
           <div className={styles.goalsFlat}>
-            {m.goals.map((g, gi) => <GoalLine key={gi} g={g} align="home" />)}
+            {m.goals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="home" />)}
           </div>
         )
       )}
@@ -276,13 +293,16 @@ function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalTyp
   )
 }
 
-// Compact card for the horizontal-scroll Bracket view — flag + name (ellipsis
-// truncated in CSS) + score only. No FIFA 3-letter codes: we have no verified
-// code list in this codebase and didn't want to guess wrong ones.
-function CompactMatchCard({ match: m, bracket, winnerMap }) {
+// Compact card for the horizontal-scroll Bracket view — flag + short name +
+// score always visible; tap to expand scorers/headline/venue/kickoff. No
+// FIFA 3-letter codes: we have no verified code list in this codebase and
+// didn't want to guess wrong ones.
+function CompactMatchCard({ match: m, live, bracket, winnerMap, getHeadline, getGoalType, isOpen, onToggle }) {
   const homeName = m.home || m.homeTeam || null
   const awayName = m.away || m.awayTeam || null
   const finished = m.status === 'finished'
+  const isLiveMatch = m.status === 'live'
+  const upset = finished && isUpset(m.winner, m.loser)
   const home = getDisplayTeam(homeName, m.homeRef, bracket, winnerMap)
   const away = getDisplayTeam(awayName, m.awayRef, bracket, winnerMap)
 
@@ -291,20 +311,66 @@ function CompactMatchCard({ match: m, bracket, winnerMap }) {
     return name === m.winner ? styles.compactWinner : styles.compactLoser
   }
 
+  const venue = getVenue(m)
+  const headline = finished ? getHeadline?.(m) : null
+  const { hasSplit, homeGoals, awayGoals } = splitGoalsByTeam(m.goals)
+  const dateText = [formatMatchDate(m.date, false), m.status === 'scheduled' ? m.kickoff : null].filter(Boolean).join(' · ')
+
   return (
-    <div className={styles.compactCard}>
+    <div className={styles.compactCard} onClick={onToggle}>
       <div className={`${styles.compactRow} ${cls(home.displayName)}`}>
         <span className={styles.compactName}>
           {home.displayName ? `${getFlag(home.displayName) ?? ''} ${shortName(home.displayName)}` : home.label}
         </span>
       </div>
       <div className={styles.compactScore}>
-        {finished ? `${m.homeScore}–${m.awayScore}` : 'vs'}
+        {live
+          ? `${live.competitors?.[0]?.score ?? '—'}–${live.competitors?.[1]?.score ?? '—'}`
+          : finished
+            ? `${m.homeScore}–${m.awayScore}${scoreSuffix(m)}`
+            : 'vs'}
       </div>
       <div className={`${styles.compactRow} ${cls(away.displayName)}`}>
         <span className={styles.compactName}>
           {away.displayName ? `${getFlag(away.displayName) ?? ''} ${shortName(away.displayName)}` : away.label}
         </span>
+      </div>
+
+      {dateText && <div className={styles.compactDate}>{dateText}</div>}
+
+      {(isLiveMatch || upset) && (
+        <div className={styles.badgeRow}>
+          {isLiveMatch && <span className={styles.badgeLive}>🔴 LIVE</span>}
+          {upset && <span className={styles.badgeUpset}>🚨 Upset</span>}
+        </div>
+      )}
+
+      <div className={`${styles.compactExpand} ${isOpen ? styles.compactExpandOpen : ''}`}>
+        <div className={styles.compactExpandInner}>
+          {venue && <div className={styles.compactVenue}>📍 {venue}</div>}
+          {m.status === 'scheduled' && m.kickoff && (
+            <div className={styles.compactKickoff}>🕐 {m.kickoff}</div>
+          )}
+
+          {m.goals?.length > 0 && (
+            hasSplit ? (
+              <div className={styles.goalsSplit}>
+                <div className={styles.goalsCol}>
+                  {homeGoals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="home" />)}
+                </div>
+                <div className={styles.goalsCol}>
+                  {awayGoals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="away" />)}
+                </div>
+              </div>
+            ) : (
+              <div className={styles.goalsFlat}>
+                {m.goals.map((g, gi) => <GoalLine key={gi} g={g} m={m} getGoalType={getGoalType} align="home" />)}
+              </div>
+            )
+          )}
+
+          {headline && <div className={styles.headline}>"{headline}"</div>}
+        </div>
       </div>
     </div>
   )
@@ -314,9 +380,14 @@ export default function Bracket() {
   const { bracket, loading, error, source } = useBracket()
   const [activeRound, setActiveRound] = useState(null)
   const [viewMode, setViewMode] = useState('list')
+  const [openMatchKey, setOpenMatchKey] = useState(null)
 
   const scrollRef = useRef(null)
   const columnRefs = useRef({})
+
+  function toggleCompactMatch(key) {
+    setOpenMatchKey(prev => prev === key ? null : key)
+  }
 
   useEffect(() => {
     if (!bracket || activeRound) return
@@ -441,7 +512,17 @@ export default function Bracket() {
                       className={`${styles.bracketPair} ${pair.length === 2 && nextRound ? styles.pairConnected : ''}`}
                     >
                       {pair.map(m => (
-                        <CompactMatchCard key={matchKey(m)} match={m} bracket={bracket} winnerMap={winnerMap} />
+                        <CompactMatchCard
+                          key={matchKey(m)}
+                          match={m}
+                          live={getLiveScore(m)}
+                          bracket={bracket}
+                          winnerMap={winnerMap}
+                          getHeadline={getHeadline}
+                          getGoalType={getGoalType}
+                          isOpen={openMatchKey === matchKey(m)}
+                          onToggle={() => toggleCompactMatch(matchKey(m))}
+                        />
                       ))}
                     </div>
                   ))}
