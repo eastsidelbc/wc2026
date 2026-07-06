@@ -11,6 +11,39 @@ const ROUND_LABELS = {
   semi_final: 'SF', third_place: '3rd', final: 'Final',
 }
 
+// Modifier class per round carrying the CSS custom properties (--round-gap,
+// --round-offset) that drive both card spacing and connector-line math below.
+const ROUND_RHYTHM_CLASS = {
+  round_of_32: 'roundR32', round_of_16: 'roundR16', quarter_final: 'roundQF',
+  semi_final: 'roundSF', third_place: 'roundThird', final: 'roundFinal',
+}
+
+// Bracket-view only — full names stay in list view. Requested pairs first;
+// the four "Real API string" entries are added because Zafronix's actual
+// field value differs from the common name for those teams (verified via
+// ZAFRONIX-API.md / TEAM_NAME_MAP earlier this session) — without them,
+// Korea Republic/Cabo Verde/Congo DR/Côte d'Ivoire would still truncate
+// since the requested key never appears in real bracket data.
+const SHORT_NAME_MAP = {
+  'Bosnia and Herzegovina': 'Bosnia',
+  'United States': 'USA',
+  'South Africa': 'S Africa',
+  'South Korea': 'S Korea',
+  'Cape Verde': 'C Verde',
+  'DR Congo': 'DR Congo',
+  'Ivory Coast': 'Ivory Coast',
+  'Saudi Arabia': 'Saudi',
+  // Real API strings:
+  'Korea Republic': 'S Korea',
+  'Cabo Verde': 'C Verde',
+  'Congo DR': 'DR Congo',
+  "Côte d'Ivoire": 'Ivory Coast',
+}
+
+function shortName(name) {
+  return name ? (SHORT_NAME_MAP[name] ?? name) : name
+}
+
 const FLAG_MAP = {}
 for (const g of groups) {
   for (const t of g.teams) {
@@ -262,7 +295,7 @@ function CompactMatchCard({ match: m, bracket, winnerMap }) {
     <div className={styles.compactCard}>
       <div className={`${styles.compactRow} ${cls(home.displayName)}`}>
         <span className={styles.compactName}>
-          {home.displayName ? `${getFlag(home.displayName) ?? ''} ${home.displayName}` : home.label}
+          {home.displayName ? `${getFlag(home.displayName) ?? ''} ${shortName(home.displayName)}` : home.label}
         </span>
       </div>
       <div className={styles.compactScore}>
@@ -270,7 +303,7 @@ function CompactMatchCard({ match: m, bracket, winnerMap }) {
       </div>
       <div className={`${styles.compactRow} ${cls(away.displayName)}`}>
         <span className={styles.compactName}>
-          {away.displayName ? `${getFlag(away.displayName) ?? ''} ${away.displayName}` : away.label}
+          {away.displayName ? `${getFlag(away.displayName) ?? ''} ${shortName(away.displayName)}` : away.label}
         </span>
       </div>
     </div>
@@ -396,7 +429,7 @@ export default function Bracket() {
             return (
               <div
                 key={r}
-                className={styles.bracketColumn}
+                className={`${styles.bracketColumn} ${styles[ROUND_RHYTHM_CLASS[r]]}`}
                 data-round={r}
                 ref={el => { columnRefs.current[r] = el }}
               >

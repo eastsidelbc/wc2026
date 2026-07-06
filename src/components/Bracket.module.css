@@ -248,9 +248,14 @@
 }
 
 /* Bracket view — horizontal-scroll columns, pure-CSS bracket-tree connectors.
-   No SVG/JS measurement: card height (54px) and gap (10px) below are fixed
-   constants, so connector positions are computed once here, not at runtime,
-   and can never desync from actual card positions. */
+   No SVG/JS measurement: card height (70px — bumped from 54px so 13px team
+   names + score actually fit) is a fixed constant, and each round's
+   --round-gap/--round-offset below are precomputed so the "pitch" (card
+   height + gap) exactly doubles every round (80 -> 160 -> 320 -> 640). That
+   doubling, PLUS the growing top offset, is what actually centers each
+   round's card on its two parents — gap alone isn't sufficient. Connector
+   pseudo-elements reference the same --round-gap so lines and cards can't
+   drift apart. */
 .bracketScroll {
   position: relative;
   display: flex;
@@ -265,25 +270,28 @@
 .bracketColumn {
   position: relative;
   flex: none;
-  min-width: 140px;
-  width: 140px;
+  min-width: 200px;
+  width: 200px;
   scroll-snap-align: center;
   padding: 0 6px;
   display: flex;
   flex-direction: column;
-  /* Fixed and identical across every column — required for space-around
-     below to center each round's cards on their two parents from the
-     previous round (8 pairs -> 4 -> 2 -> 1, same total height each time). */
-  height: 1100px;
   border-right: 1px solid var(--border);
 }
 
+.roundR32    { --round-gap: 10px;  --round-offset: 0px; }
+.roundR16    { --round-gap: 90px;  --round-offset: 40px; }
+.roundQF     { --round-gap: 250px; --round-offset: 80px; }
+.roundSF     { --round-gap: 570px; --round-offset: 160px; }
+.roundThird  { --round-gap: 0px;   --round-offset: 40px; }
+.roundFinal  { --round-gap: 0px;   --round-offset: 480px; }
+
 .bracketColHeader {
-  position: sticky;
-  /* Sits right below the relocated .chips row (top:120px + its own ~60px). */
-  top: 180px;
-  z-index: 5;
-  background: var(--bg);
+  /* Plain block — no longer sticky. Six of these exist side by side (one
+     per horizontally-scrolled column); making this sticky pinned all six
+     at the same y position while cards scrolled underneath, producing a
+     floating gold row over the content. The top .chips row already covers
+     round navigation, so this is just a label at the top of its column. */
   text-align: center;
   font-size: 11px;
   font-weight: 700;
@@ -297,35 +305,35 @@
 .bracketPairs {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  flex: 1;
+  gap: var(--round-gap);
+  padding-top: var(--round-offset);
 }
 
 .bracketPair {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--round-gap);
 }
 
-/* Vertical bar joining a pair's two cards (card height 54px, gap 10px:
-   card1 mid = 27px, card2 mid = 54+10+27 = 91px, so bar spans 27..91). */
+/* Vertical bar joining a pair's two cards. card1 mid = 35px (half of the
+   fixed 70px card height). card2 mid = 70 + gap + 35. Bar spans between
+   the two, so height = 70 + gap. */
 .pairConnected::before {
   content: '';
   position: absolute;
-  top: 27px;
-  height: 64px;
+  top: 35px;
+  height: calc(70px + var(--round-gap));
   right: -6px;
   width: 1px;
   background: var(--border);
 }
 
-/* Horizontal stub from the bar's midpoint (27 + 64/2 = 59px) into the next
-   column's gutter, reaching toward that round's single card. */
+/* Horizontal stub from the bar's midpoint into the next column's gutter. */
 .pairConnected::after {
   content: '';
   position: absolute;
-  top: 59px;
+  top: calc(35px + (70px + var(--round-gap)) / 2);
   right: -18px;
   width: 18px;
   height: 1px;
@@ -336,15 +344,15 @@
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 5px 8px;
-  height: 54px;
+  padding: 6px 10px;
+  height: 70px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .compactRow {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   padding: 2px 0;
 }
