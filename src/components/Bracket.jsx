@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { groups, powerRankings, TEAM_NAME_MAP } from '../data/static.js'
 import { useBracket } from '../hooks/useBracket.js'
 import { useLiveScores } from '../hooks/useLiveScores.js'
@@ -52,14 +52,35 @@ function matchKey(m) {
   return String(m.id ?? m.matchNo)
 }
 
-// Finds the match (in any round) whose home/away ref points at matchNo's
-// winner — i.e. the match this one "feeds into" for connector-line drawing.
-function findFeedTarget(bracket, matchNo) {
-  for (const round of ROUND_ORDER) {
-    const target = (bracket[round] || []).find(m => m.homeRef === `W${matchNo}` || m.awayRef === `W${matchNo}`)
-    if (target) return target
+// Groups a round's matches into the pairs that feed the next round, derived
+// from the next round's own homeRef/awayRef (e.g. "W12") rather than assumed
+// array order. Falls back to sequential pairing for anything not claimed by a
+// ref (e.g. third_place, whose feeder convention isn't W-refs) so nothing is
+// silently dropped from the view. Final has no next round — renders as singles.
+function pairMatches(matches, nextRoundMatches) {
+  if (!nextRoundMatches || nextRoundMatches.length === 0) {
+    return matches.map(m => [m])
   }
-  return null
+  const pairs = []
+  const used = new Set()
+  nextRoundMatches.forEach(nm => {
+    const feeders = [nm.homeRef, nm.awayRef]
+      .map(ref => {
+        const wMatch = /^W(\d+)$/.exec(ref || '')
+        if (!wMatch) return null
+        return matches.find(m => m.matchNo === Number(wMatch[1]))
+      })
+      .filter(Boolean)
+    if (feeders.length > 0) {
+      feeders.forEach(f => used.add(matchKey(f)))
+      pairs.push(feeders)
+    }
+  })
+  const leftover = matches.filter(m => !used.has(matchKey(m)))
+  for (let i = 0; i < leftover.length; i += 2) {
+    pairs.push(leftover.slice(i, i + 2))
+  }
+  return pairs
 }
 
 function buildWinnerMap(bracket) {
@@ -225,7 +246,7 @@ function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalTyp
 // Compact card for the horizontal-scroll Bracket view — flag + name (ellipsis
 // truncated in CSS) + score only. No FIFA 3-letter codes: we have no verified
 // code list in this codebase and didn't want to guess wrong ones.
-function CompactMatchCard({ match: m, bracket, winnerMap, cardRef }) {
+function CompactMatchCard({ match: m, bracket, winnerMap }) {
   const homeName = m.home || m.homeTeam || null
   const awayName = m.away || m.awayTeam || null
   const finished = m.status === 'finished'
@@ -238,7 +259,7 @@ function CompactMatchCard({ match: m, bracket, winnerMap, cardRef }) {
   }
 
   return (
-    <div className={styles.compactCard} ref={cardRef}>
+    <div className={styles.compactCard}>
       <div className={`${styles.compactRow} ${cls(home.displayName)}`}>
         <span className={styles.compactName}>
           {home.displayName ? `${getFlag(home.displayName) ?? ''} ${home.displayName}` : home.label}
@@ -260,12 +281,9 @@ export default function Bracket() {
   const { bracket, loading, error, source } = useBracket()
   const [activeRound, setActiveRound] = useState(null)
   const [viewMode, setViewMode] = useState('list')
-  const [connectors, setConnectors] = useState([])
-  const [svgSize, setSvgSize] = useState({ w: 0, h: 0 })
 
   const scrollRef = useRef(null)
   const columnRefs = useRef({})
-  const cardRefs = useRef({})
 
   useEffect(() => {
     if (!bracket || activeRound) return
@@ -285,46 +303,6 @@ export default function Bracket() {
       ((m.away || m.awayTeam) && e.name?.toLowerCase().includes((m.away || m.awayTeam).toLowerCase()))
     ) || null
   }
-
-  const measureConnectors = useCallback(() => {
-    const container = scrollRef.current
-    if (!container || !bracket) return
-    const containerRect = container.getBoundingClientRect()
-    const paths = []
-
-    ROUND_ORDER.forEach(round => {
-      ;(bracket[round] || []).forEach(m => {
-        if (m.matchNo == null) return
-        const target = findFeedTarget(bracket, m.matchNo)
-        if (!target) return
-        const fromEl = cardRefs.current[matchKey(m)]
-        const toEl = cardRefs.current[matchKey(target)]
-        if (!fromEl || !toEl) return
-
-        const fromRect = fromEl.getBoundingClientRect()
-        const toRect = toEl.getBoundingClientRect()
-        const x1 = fromRect.right - containerRect.left + container.scrollLeft
-        const y1 = fromRect.top + fromRect.height / 2 - containerRect.top + container.scrollTop
-        const x2 = toRect.left - containerRect.left + container.scrollLeft
-        const y2 = toRect.top + toRect.height / 2 - containerRect.top + container.scrollTop
-        const midX = (x1 + x2) / 2
-        paths.push(`M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`)
-      })
-    })
-
-    setConnectors(paths)
-    setSvgSize({ w: container.scrollWidth, h: container.scrollHeight })
-  }, [bracket])
-
-  useEffect(() => {
-    if (viewMode !== 'bracket' || !bracket) return
-    const raf = requestAnimationFrame(measureConnectors)
-    window.addEventListener('resize', measureConnectors)
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener('resize', measureConnectors)
-    }
-  }, [viewMode, bracket, measureConnectors])
 
   useEffect(() => {
     if (viewMode !== 'bracket') return
@@ -412,34 +390,33 @@ export default function Bracket() {
         </>
       ) : (
         <div className={styles.bracketScroll} ref={scrollRef}>
-          <svg className={styles.connectorSvg} width={svgSize.w} height={svgSize.h}>
-            {connectors.map((d, i) => (
-              <path key={i} d={d} className={styles.connectorPath} />
-            ))}
-          </svg>
-
-          {ROUND_ORDER.map(r => (
-            <div
-              key={r}
-              className={styles.bracketColumn}
-              data-round={r}
-              ref={el => { columnRefs.current[r] = el }}
-            >
-              <div className={styles.bracketColHeader}>{ROUND_LABELS[r]}</div>
-              {(bracket[r] || []).map(m => (
-                <CompactMatchCard
-                  key={matchKey(m)}
-                  match={m}
-                  bracket={bracket}
-                  winnerMap={winnerMap}
-                  cardRef={el => { cardRefs.current[matchKey(m)] = el }}
-                />
-              ))}
-              {(bracket[r] || []).length === 0 && (
-                <div className={styles.compactEmpty}>TBD</div>
-              )}
-            </div>
-          ))}
+          {ROUND_ORDER.map((r, ri) => {
+            const nextRound = ROUND_ORDER[ri + 1]
+            const pairs = pairMatches(bracket[r] || [], nextRound ? (bracket[nextRound] || []) : [])
+            return (
+              <div
+                key={r}
+                className={styles.bracketColumn}
+                data-round={r}
+                ref={el => { columnRefs.current[r] = el }}
+              >
+                <div className={styles.bracketColHeader}>{ROUND_LABELS[r]}</div>
+                <div className={styles.bracketPairs}>
+                  {pairs.map((pair, pi) => (
+                    <div
+                      key={pi}
+                      className={`${styles.bracketPair} ${pair.length === 2 && nextRound ? styles.pairConnected : ''}`}
+                    >
+                      {pair.map(m => (
+                        <CompactMatchCard key={matchKey(m)} match={m} bracket={bracket} winnerMap={winnerMap} />
+                      ))}
+                    </div>
+                  ))}
+                  {pairs.length === 0 && <div className={styles.compactEmpty}>TBD</div>}
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

@@ -29,8 +29,12 @@
   scrollbar-width: none;
   padding: 4px 0 12px;
   position: sticky;
-  top: 0;
-  z-index: 100;
+  /* Header.module.css .header is also position:sticky;top:0;z-index:100 (the
+     whole title+nav block, ~120px tall including its 20px/16px padding). We
+     stick below it, not at top:0, and use a lower z-index as a second layer
+     of defense so the app header always wins if this estimate is ever off. */
+  top: 120px;
+  z-index: 10;
   background: var(--bg);
 }
 
@@ -243,7 +247,10 @@
   margin-bottom: 10px;
 }
 
-/* Bracket view — horizontal-scroll columns with SVG connectors */
+/* Bracket view — horizontal-scroll columns, pure-CSS bracket-tree connectors.
+   No SVG/JS measurement: card height (54px) and gap (10px) below are fixed
+   constants, so connector positions are computed once here, not at runtime,
+   and can never desync from actual card positions. */
 .bracketScroll {
   position: relative;
   display: flex;
@@ -255,19 +262,6 @@
   padding-bottom: 8px;
 }
 
-.connectorSvg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-}
-
-.connectorPath {
-  fill: none;
-  stroke: var(--border);
-  stroke-width: 1.5;
-}
-
 .bracketColumn {
   position: relative;
   flex: none;
@@ -275,11 +269,19 @@
   width: 140px;
   scroll-snap-align: center;
   padding: 0 6px;
+  display: flex;
+  flex-direction: column;
+  /* Fixed and identical across every column — required for space-around
+     below to center each round's cards on their two parents from the
+     previous round (8 pairs -> 4 -> 2 -> 1, same total height each time). */
+  height: 1100px;
+  border-right: 1px solid var(--border);
 }
 
 .bracketColHeader {
   position: sticky;
-  top: 60px;
+  /* Sits right below the relocated .chips row (top:120px + its own ~60px). */
+  top: 180px;
   z-index: 5;
   background: var(--bg);
   text-align: center;
@@ -289,16 +291,56 @@
   text-transform: uppercase;
   color: var(--gold);
   padding: 6px 0;
+  flex: none;
+}
+
+.bracketPairs {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex: 1;
+}
+
+.bracketPair {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Vertical bar joining a pair's two cards (card height 54px, gap 10px:
+   card1 mid = 27px, card2 mid = 54+10+27 = 91px, so bar spans 27..91). */
+.pairConnected::before {
+  content: '';
+  position: absolute;
+  top: 27px;
+  height: 64px;
+  right: -6px;
+  width: 1px;
+  background: var(--border);
+}
+
+/* Horizontal stub from the bar's midpoint (27 + 64/2 = 59px) into the next
+   column's gutter, reaching toward that round's single card. */
+.pairConnected::after {
+  content: '';
+  position: absolute;
+  top: 59px;
+  right: -18px;
+  width: 18px;
+  height: 1px;
+  background: var(--border);
 }
 
 .compactCard {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 8px;
-  margin-bottom: 40px;
-  position: relative;
-  z-index: 1;
+  padding: 5px 8px;
+  height: 54px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .compactRow {
