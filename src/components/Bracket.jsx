@@ -222,8 +222,8 @@ function GoalLine({ g, m, getGoalType, align }) {
 function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalType, matchDetail }) {
   const homeName = m.home || m.homeTeam || null
   const awayName = m.away || m.awayTeam || null
-  const finished = m.status === 'finished'
-  const isLiveMatch = m.status === 'live'
+  const finished = m.homeScore != null && m.awayScore != null
+  const isLiveMatch = !!live
   const upset = finished && isUpset(m.winner, m.loser)
 
   function rowClass(teamName) {
@@ -304,8 +304,8 @@ function MatchCard({ match: m, live, winnerMap, bracket, getHeadline, getGoalTyp
 function CompactMatchCard({ match: m, live, bracket, winnerMap, getHeadline, getGoalType, matchDetail, isOpen, onToggle }) {
   const homeName = m.home || m.homeTeam || null
   const awayName = m.away || m.awayTeam || null
-  const finished = m.status === 'finished'
-  const isLiveMatch = m.status === 'live'
+  const finished = m.homeScore != null && m.awayScore != null
+  const isLiveMatch = !!live
   const upset = finished && isUpset(m.winner, m.loser)
   const home = getDisplayTeam(homeName, m.homeRef, bracket, winnerMap)
   const away = getDisplayTeam(awayName, m.awayRef, bracket, winnerMap)

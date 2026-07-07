@@ -317,33 +317,30 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  /* No gap here on purpose — this wraps the 2 sibling matches that feed one
-     next-round match, and they should sit tight against each other. Spacing
-     between different pairs comes from .bracketPairs' own gap below. */
+  /* Reverted: a same-round-gap value here (not 0) keeps every card in the
+     round evenly spaced, sibling pair or not — a tighter within-pair gap
+     looked jarring next to the much larger between-pair gap. */
+  gap: var(--round-gap);
 }
 
-/* Vertical bar joining a pair's two cards. With no gap between them, card1
-   occupies 0-88px (mid 44px) and card2 88-176px (mid 132px) regardless of
-   round, so the bar spans a fixed 44..132 (height 88px) — it no longer
-   depends on --round-gap now that the within-pair gap is 0. */
+/* Vertical bar joining a pair's two cards. card1 mid = 44px (half of the
+   fixed 88px card height). card2 mid = 88 + gap + 44. Bar spans between
+   the two, so height = 88 + gap. */
 .pairConnected::before {
   content: '';
   position: absolute;
   top: 44px;
-  height: 88px;
+  height: calc(88px + var(--round-gap));
   right: -6px;
   width: 1px;
   background: var(--border);
 }
 
-/* Horizontal stub from the bar's midpoint (now a fixed 88px, not
-   round-gap-dependent — see above) into the next column's gutter. Gutter is
-   6px (this column's right padding) + 6px (next column's left padding) with
-   no border in between anymore. */
+/* Horizontal stub from the bar's midpoint into the next column's gutter. */
 .pairConnected::after {
   content: '';
   position: absolute;
-  top: 88px;
+  top: calc(44px + (88px + var(--round-gap)) / 2);
   right: -13px;
   width: 13px;
   height: 1px;
@@ -388,11 +385,18 @@
 }
 
 .compactScore {
+  align-self: center;
+  min-width: 76px;
   font-size: 10px;
   font-weight: 700;
   color: var(--subtext);
   text-align: center;
-  padding: 2px 0;
+  white-space: nowrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin: 2px 0;
 }
 
 .compactDate {
