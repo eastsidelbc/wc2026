@@ -26,3 +26,23 @@ Before any task, identify which agent applies and read its file:
 ## End of Every Session
 Update docs/CHANGELOG.md with what changed and why.
 Update status table in docs/PROJECT.md.
+
+### Vault session summary (the brain)
+When I say "end session", also follow my master brain's session-end protocol:
+1. Ask ONE question: "What do you want to work on next session?" Wait for answer.
+2. Write ONE combined summary to the Obsidian vault (outside this repo — you may need to confirm writing there):
+   `/mnt/d/Programs/Obsidian/Vault/Me/Projects/wc2026/session-summaries/YYYY-MM-DD-session.md`
+   (`/mnt/d/...` in WSL = `D:\...` in Windows — same folder.)
+3. Use this format:
+```
+[SESSION COMPLETE] — [YYYY-MM-DD]
+BUILT:      [what was done]
+BUGS FIXED: [list or none]
+DECISIONS:  [list or none]
+COMMITS:    [suggested git messages]
+NEXT SESSION:
+Goal:       [what I said I want next]
+First step: [exact first action]
+Read first: [files to load at session start]
+```
+Full protocol reference (in vault): `.claude/protocols/session-end.md`.

@@ -26,7 +26,7 @@ Built to be used during the tournament (Jun 11 – Jul 19, 2026).
 ## Tabs / Features
 | Tab | Data Source | Status |
 |---|---|---|
-| Bracket | Zafronix `/bracket` (API-driven, no static data) | ✅ List + horizontal Bracket view, TBD resolution, not yet visually verified in a browser |
+| Bracket | Zafronix `/bracket` (API-driven, no static data) | ✅ List + horizontal Bracket view, TBD resolution, scores fixed + visually verified; ESPN wiring + goal detail added, pair-spacing revert not yet visually re-checked |
 | Power Rankings | Static (`src/data/static.js`) | ✅ Done |
 | Groups | Static + Zafronix standings | ✅ Live standings + verdict badges wired |
 | Schedule | Static + Zafronix + ESPN | ✅ Scores, venue, match recap accordion |
@@ -39,7 +39,9 @@ Built to be used during the tournament (Jun 11 – Jul 19, 2026).
 ✅ Static data consolidated (team name aliases + odds moved into `data/static.js`)
 ✅ Dead hooks (`useRoster.js`, `useScorers.js`) removed
 ✅ Knockout Bracket tab built end-to-end (API wiring, component, two rounds of bug fixes) — see `docs/BRACKET-PLAN.md` and CHANGELOG for detail
-🔲 Bracket UI not yet checked in an actual browser — do this before calling it done
+✅ Bracket scores bug fixed (missing `status` field on `/bracket` data) + score pill widened + visually verified in a real browser via Playwright MCP
+✅ Bracket ESPN headline/goal-type wiring fixed for `/bracket`-sourced matches (`home`/`away` field fallback); goal-by-goal detail added via `matchDetail` lookup against `/matches`
+🔲 Bracket-pair spacing regression fixed (reverted `.bracketPair` gap) but not yet visually re-checked in a browser — do this next session
 
 ## Repo
 - GitHub: https://github.com/eastsidelbc/wc2026

@@ -4,6 +4,41 @@ Format: [Date] — What changed and why
 
 ---
 
+## [2026-07-06] — Bracket Scores Fix + Browser Verification
+
+### Bracket scores were never showing (root cause found)
+- `src/components/Bracket.jsx`: `finished`/`isLiveMatch` in `MatchCard` and `CompactMatchCard` checked `m.status === 'finished'`/`'live'` — verified via live curl against `/bracket?year=2026` that this endpoint has **no `status` field at all** (only `matchId`, `matchNo`, `stage`, `homeRef`/`awayRef`, `home`/`away`, `kickoffUtc`, `stadium`, `city`, `homeScore`/`awayScore`, `winner`, `loser`). `finished` was always `false`, so every card fell back to showing `vs` even though `homeScore`/`awayScore` were already present in the data. Venue still rendered fine since `getVenue()` never checked status.
+- Fix: derive `finished` from `m.homeScore != null && m.awayScore != null` and `isLiveMatch` from the existing ESPN-sourced `live` prop — same pattern `Schedule.jsx` already used successfully for the same data source.
+- Affected both the List and visual Bracket sub-views (they share the same bracket data).
+
+### Score pill widened
+- `Bracket.module.css`: `.compactScore` was plain centered text with no visual container — now a real pill (background, border, `border-radius: 999px`, padding, min-width) with room for longer strings like AET/PK suffixes.
+
+### First real browser verification of the Bracket tab
+- Set up Playwright MCP (`@playwright/mcp`) for this WSL2/Cursor environment — required installing a **native Linux Node** (via `nvm`) and **native Linux Bun** (`~/.bun/bin`), because the only previously-installed Node/Bun were Windows-side binaries reached through WSL interop; that interop boundary silently broke both the MCP stdio connection (30s timeout, no error) and dev-server network reachability (`vite` reported "ready" but was unreachable from WSL's own `curl`/browser). Also installed Playwright's Linux Chromium + system deps (fonts, `libnss3`, `libnspr4`, etc. via `sudo playwright install-deps`).
+- With that working, navigated the actual running app and confirmed: real scores now render (e.g. `3–2`, `1–1`) in both List and Bracket views, the score pill renders correctly, no console errors. This closes out the "not yet visually verified in a browser" known limitation from the previous Bracket session.
+- Net effect: future sessions can self-verify UI changes in a real headless browser instead of relying on code review alone.
+
+### Commit
+- `4d6c4aa` — pushed to `main`
+
+## [2026-07-06] — Bracket ESPN Wiring + Goal Detail + Layout Spacing
+
+### ESPN headline/goal-type lookup wasn't matching bracket-sourced matches
+- `matchCard-helpers.js`: `getHeadline`/`getGoalType` built their ESPN lookup key from `zm.homeTeam`/`zm.awayTeam` only, but `/bracket` match objects use `home`/`away` instead. Fixed both to read `zm.home ?? zm.homeTeam` and `zm.away ?? zm.awayTeam` so the same helpers work for both `/bracket`- and `/matches`-sourced objects.
+
+### Bracket cards had no goal-by-goal detail
+- `/bracket` match objects have no `goals[]` array (only aggregate `homeScore`/`awayScore`), so `CompactMatchCard`'s expand section was always empty even for finished matches.
+- `Bracket.jsx`: added a `matchDetail` lookup (via `useMatches()`, keyed by `matchNo`) so the compact card's expand section pulls `goals`/headline/goal-type from the full `/matches` object (`matchDetail[m.matchNo] ?? m`) while everything else still comes from the bracket structure.
+
+### Bracket-view spacing regression (found post-fix, reverted)
+- A first pass removed `.bracketPair`'s `gap` entirely (reasoning: the two cards in a pair should sit tight, only between-pair spacing should scale with round). Visually this looked wrong — sibling-pair cards sat flush together while non-sibling cards had the full round-scaled gap, most noticeable in the R16 column's 108px gap.
+- Reverted `.bracketPair` back to `gap: var(--round-gap)` (matching the round's overall rhythm) and restored the `.pairConnected::before`/`::after` connector math to its `--round-gap`-dependent form to match. `.bracketColumn`'s `border-right` removal and the `::after` stub width fix (`13px`) from the same original pass were kept — those weren't part of the regression.
+- Not visually confirmed in a browser this pass (no dev server/browser access at the time) — flagged to the user as still needing a real visual check next session.
+
+### Commit
+- `bcca72f` — pushed to `main`
+
 ## [2026-07-06] — Knockout Bracket Feature (API-driven)
 
 ### API wiring
